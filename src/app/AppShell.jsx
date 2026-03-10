@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import logo from '../images/logo.png';
+import { Box, Button } from '@mui/material';
 import ConversationPanel from '../components/chat/ConversationPanel';
 import SideWorkspace from '../components/sidepanel/SideWorkspace';
 import { fetchJson } from '../lib/api';
@@ -107,6 +109,7 @@ export default function AppShell() {
   const [showContractSurface, setShowContractSurface] = useState(true);
   const [showProtocolTrace, setShowProtocolTrace] = useState(true);
   const [activePanel, setActivePanel] = useState('state');
+  const [showWorkspace, setShowWorkspace] = useState(false);
 
   const orderId = order?.orderId || session?.checkoutSessionId || session?.sessionId || '';
 
@@ -177,6 +180,7 @@ export default function AppShell() {
     setCartDraft({ qty: 1, shippingAddress: { line1: '1 Hackathon Way', city: 'Columbus', region: 'OH', postalCode: '43004' } });
     setPaymentDraft({ railPreference: 'bnpl', detailsLabel: 'BNPL approval requested' });
     setActivePanel('state');
+    setShowWorkspace(false);
   }
 
   function handleReset() {
@@ -414,8 +418,8 @@ export default function AppShell() {
   }
 
   const heroCopy = minimalUi
-    ? 'Conversational ACP surface on the left, operational workspace on the right.'
-    : 'A chat-guided ACP surface on the left and a control workspace on the right, with Bedrock planning and contract trace available when needed.';
+    ? 'A shopper-first conversational commerce surface with optional agent-step visibility.'
+    : 'A chat-guided commerce surface for product discovery, financing, and checkout, with technical agent steps available only when needed.';
   const workspaceHeight = minimalUi ? 'calc(100vh - 126px)' : 'calc(100vh - 164px)';
 
   return (
@@ -436,40 +440,71 @@ export default function AppShell() {
             marginBottom: 12
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start', flexWrap: 'wrap' }}>
-            <div>
-              <div
-                style={{
-                  fontFamily: bareBonesUi ? '"Segoe UI", Arial, sans-serif' : '"Trebuchet MS", sans-serif',
-                  fontSize: 11,
-                  letterSpacing: '0.16em',
-                  textTransform: 'uppercase',
-                  color: palette.slate,
-                  marginBottom: 8
-                }}
-              >
-                Agentic Commerce / ACP surface
-              </div>
-              <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
-                Chat-guided checkout with protocol trace.
-              </h1>
-              <p style={{ margin: '8px 0 0', maxWidth: 760, fontSize: minimalUi ? 15 : 18, color: 'rgba(24,22,26,0.78)' }}>
-                {heroCopy}
-              </p>
-            </div>
+         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+ <img
+  src={logo}
+  alt="logo"
+  style={{
+    height:186,
+    width: 'auto',
+    objectFit: 'contain'
+  }}
+/>
+
+        <div>
+          <div
+            style={{
+              fontFamily: bareBonesUi ? '"Segoe UI", Arial, sans-serif' : '"Trebuchet MS", sans-serif',
+              fontSize: 11,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: palette.slate,
+              marginBottom: 8
+            }}
+          >
+            Agentic Commerce / ACP surface
           </div>
+
+          <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
+            Chat-guided checkout with protocol trace.
+          </h1>
+
+          <p style={{ margin: '8px 0 0', maxWidth: 760, fontSize: minimalUi ? 15 : 18, color: 'rgba(24,22,26,0.78)' }}>
+            {heroCopy}
+          </p>
+        </div>
+      </div>
+
+          {/* <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Button
+              variant={showWorkspace ? 'contained' : 'outlined'}
+              onClick={() => setShowWorkspace((prev) => !prev)}
+              sx={{
+                borderRadius: '999px',
+                px: 2,
+                py: 1,
+                boxShadow: 'none'
+              }}
+            >
+              {showWorkspace ? 'Hide agent steps' : 'Show agent steps'}
+            </Button>
+          </div> */}
+          <div />
+        </div>
         </section>
 
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: '1.5fr 1fr',
+            gridTemplateColumns: showWorkspace ? 'minmax(0,1.5fr) minmax(360px,1fr)' : 'minmax(0,1fr)',
             gap: 16,
             alignItems: 'stretch',
             height: workspaceHeight,
             minHeight: 700,
             maxHeight: workspaceHeight,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'all 0.25s ease'
           }}
         >
           <ConversationPanel
@@ -506,36 +541,76 @@ export default function AppShell() {
             }}
           />
 
-          <SideWorkspace
-            bareBonesUi={bareBonesUi}
-            routeMode={routeMode}
-            orderStatus={routeStatus}
-            plannerStatus={planState?.source || eligibility?.preferredRail}
-            showContractSurface={showContractSurface}
-            setShowContractSurface={setShowContractSurface}
-            showProtocolTrace={showProtocolTrace}
-            setShowProtocolTrace={setShowProtocolTrace}
-            activePanel={activePanel}
-            setActivePanel={setActivePanel}
-            flowProps={{
-              planState,
-              product,
-              consentRecord,
-              screening,
-              session,
-              eligibility,
-              paymentDraft,
-              token,
-              order,
-              shippingStatus,
-              cartDraft,
-              orderId
-            }}
-            contracts={contractSummary}
-            trace={trace}
-            base={API_BASE}
-          />
+          {showWorkspace ? (
+            <SideWorkspace
+              bareBonesUi={bareBonesUi}
+              routeMode={routeMode}
+              orderStatus={routeStatus}
+              plannerStatus={planState?.source || eligibility?.preferredRail}
+              showContractSurface={showContractSurface}
+              setShowContractSurface={setShowContractSurface}
+              showProtocolTrace={showProtocolTrace}
+              setShowProtocolTrace={setShowProtocolTrace}
+              activePanel={activePanel}
+              setActivePanel={setActivePanel}
+              flowProps={{
+                planState,
+                product,
+                consentRecord,
+                screening,
+                session,
+                eligibility,
+                paymentDraft,
+                token,
+                order,
+                shippingStatus,
+                cartDraft,
+                orderId
+              }}
+              contracts={contractSummary}
+              trace={trace}
+              base={API_BASE}
+            />
+          ) : null}
         </section>
+        <Box
+            sx={{
+              position: 'fixed',
+              right: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1300,
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <Button
+              onClick={() => setShowWorkspace((prev) => !prev)}
+              variant="contained"
+              sx={{
+                minWidth: 'unset',
+                px: 1.1,
+                py: 1.6,
+                borderRadius: '16px 0 0 16px',
+                writingMode: 'vertical-rl',
+                textOrientation: 'mixed',
+                textTransform: 'none',
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                boxShadow: '0 12px 28px rgba(24,22,26,0.16)',
+                background: showWorkspace
+                  ? 'linear-gradient(180deg, #cd5b2e 0%, #b44e25 100%)'
+                  : 'linear-gradient(180deg, #1e6d74 0%, #275a67 100%)',
+                '&:hover': {
+                  background: showWorkspace
+                    ? 'linear-gradient(180deg, #c2552c 0%, #a94922 100%)'
+                    : 'linear-gradient(180deg, #1b646a 0%, #234f5b 100%)'
+                }
+              }}
+            >
+              {showWorkspace ? 'Hide agent steps' : 'Agent steps'}
+            </Button>
+          </Box>
       </div>
     </div>
   );

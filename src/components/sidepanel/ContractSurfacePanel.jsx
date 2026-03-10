@@ -1,26 +1,56 @@
 import React from 'react';
+import { Box, Paper, Typography } from '@mui/material';
 import StatPill from '../common/StatPill';
 
 export default function ContractSurfacePanel({ contracts }) {
   if (!contracts.length) {
-    return <div style={{ color: 'rgba(24,22,26,0.65)' }}>Contract target summary appears after the first flow execution.</div>;
+    return (
+      <Typography sx={{ color: 'rgba(24,22,26,0.65)', lineHeight: 1.5 }}>
+        Contract target summary appears after the first flow execution.
+      </Typography>
+    );
   }
+
   return (
-    <div style={{ display: 'grid', gap: 10 }}>
+    <Box sx={{ display: 'grid', gap: 1.25 }}>
       {contracts.map((contract) => (
-        <div key={`${contract.targetName}-${contract.operationId}`} style={{ border: '1px solid rgba(24,22,26,0.12)', borderRadius: 16, padding: 12, background: 'rgba(255,255,255,0.78)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-            <div>
-              <div style={{ fontFamily: '"Trebuchet MS", sans-serif', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#43505e' }}>
+        <Paper
+          key={`${contract.targetName}-${contract.operationId}`}
+          elevation={0}
+          sx={{
+            border: '1px solid rgba(24,22,26,0.10)',
+            borderRadius: '16px',
+            p: 1.5,
+            background: 'rgba(255,255,255,0.9)'
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.25, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Box>
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.14em',
+                  color: '#43505e',
+                  fontWeight: 700
+                }}
+              >
                 {contract.targetName}
-              </div>
-              <div style={{ marginTop: 4, fontSize: 15 }}>{contract.operationId}</div>
-            </div>
+              </Typography>
+
+              <Typography sx={{ mt: 0.5, fontSize: 15, fontWeight: 600 }}>
+                {contract.operationId}
+              </Typography>
+            </Box>
+
             <StatPill label={contract.surfaceMode || 'direct_http'} compact />
-          </div>
-          <div style={{ marginTop: 8, color: 'rgba(24,22,26,0.72)', wordBreak: 'break-all' }}>{contract.contractPath}</div>
-        </div>
+          </Box>
+
+          <Typography sx={{ mt: 1, color: 'rgba(24,22,26,0.72)', wordBreak: 'break-all', lineHeight: 1.45 }}>
+            {contract.contractPath}
+          </Typography>
+        </Paper>
       ))}
-    </div>
+    </Box>
   );
 }

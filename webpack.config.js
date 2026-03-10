@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '.env.local' });
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -144,18 +145,22 @@ module.exports = {
       }
     ]
   },
-  module: {
-    rules: [
-      {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: { presets: ['@babel/preset-react'] }
-        }
+ module: {
+  rules: [
+    {
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: { presets: ['@babel/preset-react'] }
       }
-    ]
-  },
+    },
+    {
+      test: /\.(png|jpe?g|gif|svg|webp)$/i,
+      type: 'asset/resource'
+    }
+  ]
+},
   resolve: {
     extensions: ['.js', '.jsx']
   }

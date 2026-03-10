@@ -1,4 +1,7 @@
 ﻿import React from 'react';
+import { Box, Button, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded';
 
 export default function ControlBar({
   routeMode,
@@ -20,97 +23,109 @@ export default function ControlBar({
   }
 
   return (
-    <div style={{ display: 'grid', gap: 10 }}>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {[
-          { key: 'acp', label: 'Run ACP flow' },
-          { key: 'agentcore', label: 'Run AgentCore flow' }
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setRouteMode(tab.key)}
-            style={{
-              padding: '9px 13px',
-              borderRadius: bareBonesUi ? 4 : 999,
-              border: bareBonesUi ? '1px solid #bdbdbd' : '1px solid rgba(24,22,26,0.12)',
-              background: routeMode === tab.key ? (bareBonesUi ? '#e6e6e6' : '#3e6d6b') : 'rgba(255,255,255,0.78)',
-              color: routeMode === tab.key ? (bareBonesUi ? '#111111' : '#f5efe4') : '#243039',
-              cursor: 'pointer',
-              fontSize: 13,
+    <Box sx={{ display: 'grid', gap: 1.25 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+        <ToggleButtonGroup
+          exclusive
+          value={routeMode}
+          onChange={(_, next) => {
+            if (next) setRouteMode(next);
+          }}
+          size="small"
+          sx={{
+            '& .MuiToggleButton-root': {
+              borderRadius: '999px !important',
+              px: 1.5,
+              py: 0.75,
+              textTransform: 'none',
               fontWeight: 600
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+            }
+          }}
+        >
+          <ToggleButton value="acp">Run ACP flow</ToggleButton>
+          <ToggleButton value="agentcore">Run AgentCore flow</ToggleButton>
+        </ToggleButtonGroup>
 
-      <div
-        style={{
-          border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-          borderRadius: bareBonesUi ? 4 : 18,
-          background: '#ffffff',
-          padding: 10,
-          display: 'grid',
-          gap: 8
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+          {routeMode === 'agentcore'
+            ? `Planner source: Bedrock runtime${!lockDemoConfig && !runtimeReady ? ' (runtime ARN not configured)' : ''}`
+            : 'Chat-guided ACP flow'}
+        </Typography>
+      </Box>
+
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 3,
+          border: '1px solid rgba(24,22,26,0.10)',
+          background: 'rgba(255,255,255,0.92)',
+          p: 1.25
         }}
       >
-        <textarea
-          rows={2}
+        <TextField
+          multiline
+          minRows={2}
+          maxRows={6}
+          fullWidth
+          variant="standard"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={submitFromTextArea}
-          placeholder={routeMode === 'agentcore' ? 'Ask the runtime to plan and complete the shopping flow' : 'Ask for a product, budget, financing, or delivery preference'}
-          style={{ border: 'none', outline: 'none', resize: 'none', background: 'transparent', fontSize: 15, lineHeight: 1.45, minHeight: 78 }}
+          placeholder={
+            routeMode === 'agentcore'
+              ? 'Ask the runtime to plan and complete the shopping flow'
+              : 'Ask for a product, budget, financing, or delivery preference'
+          }
+          InputProps={{
+            disableUnderline: true
+          }}
+          sx={{
+            '& .MuiInputBase-root': {
+              alignItems: 'flex-start',
+              fontSize: 15,
+              lineHeight: 1.5
+            }
+          }}
         />
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ fontFamily: '"Trebuchet MS", sans-serif', fontSize: 12, color: '#43505e' }}>
-            {routeMode === 'agentcore'
-              ? `Planner source: Bedrock runtime${!lockDemoConfig && !runtimeReady ? ' (runtime ARN not configured)' : ''}`
-              : 'Chat-guided ACP flow'}
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mt: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Try prompts like “suggest treadmills under 1200; offer financing”
+          </Typography>
+
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Button
               onClick={onReset}
               disabled={loading}
-              style={{
-              padding: '9px 12px',
-                borderRadius: bareBonesUi ? 4 : 999,
-                border: bareBonesUi ? '1px solid #bdbdbd' : '1px solid rgba(24,22,26,0.12)',
-                background: bareBonesUi ? '#f4f4f4' : 'rgba(242,236,226,0.92)',
-                color: '#40515d',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: 12.5,
+              variant="outlined"
+              startIcon={<RestartAltRoundedIcon />}
+              sx={{
+                borderRadius: '999px',
+                textTransform: 'none',
                 fontWeight: 600
               }}
-              aria-label="Reset conversation"
-              title="Reset conversation"
             >
               Reset
-            </button>
-            <button
+            </Button>
+
+            <Button
               onClick={onSend}
               disabled={loading || (routeMode === 'agentcore' && !runtimeReady)}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: bareBonesUi ? 4 : '50%',
-                border: bareBonesUi ? '1px solid #bdbdbd' : 'none',
-                background: routeMode === 'agentcore' ? (bareBonesUi ? '#efefef' : '#3d8588') : bareBonesUi ? '#efefef' : '#486d73',
-                color: bareBonesUi ? '#111111' : '#f5efe4',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: 18,
-                lineHeight: 1,
-                fontWeight: 700
+              variant="contained"
+              endIcon={<SendRoundedIcon />}
+              sx={{
+                borderRadius: '999px',
+                px: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                boxShadow: 'none'
               }}
-              aria-label="Send prompt"
-              title="Send prompt"
             >
-              ↑
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+              Send
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
+    </Box>
   );
 }

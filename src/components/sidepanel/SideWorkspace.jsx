@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { Box, Paper, Tab, Tabs, Typography } from '@mui/material';
 import RouteSummaryCard from './RouteSummaryCard';
 import FlowStatePanel from './FlowStatePanel';
 import ContractSurfacePanel from './ContractSurfacePanel';
@@ -21,81 +22,98 @@ export default function SideWorkspace({
   base
 }) {
   const tabs = [
-    { key: 'state', label: 'Flow state', visible: true },
-    { key: 'contracts', label: 'Contract surface', visible: showContractSurface },
-    { key: 'trace', label: 'Protocol trace', visible: showProtocolTrace }
+    { key: 'state', label: 'Journey', visible: true },
+    { key: 'contracts', label: 'Contracts', visible: showContractSurface },
+    { key: 'trace', label: 'Trace', visible: showProtocolTrace }
   ].filter((tab) => tab.visible);
 
+  const tabIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.key === activePanel)
+  );
+
   return (
-    <div
-      style={{
+    <Paper
+      elevation={0}
+      sx={{
         background: '#ffffff',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-        borderRadius: bareBonesUi ? 6 : 24,
-        padding: 12,
+        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.10)',
+        borderRadius: bareBonesUi ? '6px' : '24px',
+        p: 1.5,
         display: 'grid',
-        gap: 10,
+        gap: 1.25,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
-        gridTemplateRows: 'auto auto 1fr'
+        gridTemplateRows: 'auto auto 1fr',
+        boxShadow: bareBonesUi ? 'none' : '0 16px 40px rgba(24,22,26,0.06)'
       }}
     >
-      <RouteSummaryCard routeMode={routeMode} orderStatus={orderStatus} plannerStatus={plannerStatus} bareBonesUi={bareBonesUi} />
+      <RouteSummaryCard
+        routeMode={routeMode}
+        orderStatus={orderStatus}
+        plannerStatus={plannerStatus}
+        bareBonesUi={bareBonesUi}
+      />
 
-      <div style={{ display: 'grid', gap: 10 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActivePanel(tab.key)}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: bareBonesUi ? 4 : 10,
-                  border: bareBonesUi ? '1px solid #bdbdbd' : '1px solid rgba(24,22,26,0.12)',
-                  background: activePanel === tab.key ? (bareBonesUi ? '#efefef' : '#3e6d6b') : 'rgba(255,255,255,0.78)',
-                  color: activePanel === tab.key ? (bareBonesUi ? '#111111' : '#f5efe4') : '#243039',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: 600
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontFamily: '"Trebuchet MS", sans-serif', fontSize: 12.5, color: '#43505e' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="checkbox" checked={showContractSurface} onChange={(e) => setShowContractSurface(e.target.checked)} />
-            Contract surface
-          </label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <input type="checkbox" checked={showProtocolTrace} onChange={(e) => setShowProtocolTrace(e.target.checked)} />
-            Protocol trace
-          </label>
-        </div>
-      </div>
+      <Box sx={{ display: 'grid', gap: 1 }}>
+        <Box>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'text.secondary',
+              letterSpacing: '0.14em',
+              fontWeight: 700
+            }}
+          >
+            Behind the scenes
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            Review the journey, contract surfaces, and request trace for the current flow.
+          </Typography>
+        </Box>
 
-      <div
-        style={{
+        <Tabs
+          value={tabIndex}
+          onChange={(_, nextIndex) => {
+            const nextTab = tabs[nextIndex];
+            if (nextTab) setActivePanel(nextTab.key);
+          }}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            minHeight: 40,
+            '& .MuiTab-root': {
+              minHeight: 40,
+              textTransform: 'none',
+              fontWeight: 700
+            }
+          }}
+        >
+          {tabs.map((tab) => (
+            <Tab key={tab.key} label={tab.label} />
+          ))}
+        </Tabs>
+      </Box>
+
+      <Paper
+        elevation={0}
+        sx={{
           overflow: 'hidden',
           minHeight: 0,
-          paddingRight: 0,
           background: '#ffffff',
-          border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.1)',
-          borderRadius: bareBonesUi ? 4 : 18,
-          padding: 10,
+          border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.08)',
+          borderRadius: bareBonesUi ? '4px' : '18px',
+          p: 1.25,
           height: '100%'
         }}
       >
-        <div style={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, height: '100%', paddingRight: 4 }}>
+        <Box sx={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, height: '100%', pr: 0.5 }}>
           {activePanel === 'state' ? <FlowStatePanel {...flowProps} bareBonesUi={bareBonesUi} /> : null}
           {activePanel === 'contracts' && showContractSurface ? <ContractSurfacePanel contracts={contracts} /> : null}
           {activePanel === 'trace' && showProtocolTrace ? <ProtocolTracePanel trace={trace} base={base} /> : null}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Paper>
+    </Paper>
   );
 }

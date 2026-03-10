@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 import { palette } from '../../lib/theme';
 
 function statusTone(status) {
@@ -17,25 +18,24 @@ function statusTone(status) {
 
 export default function StatPill({ label, compact = false }) {
   const tone = statusTone(label);
+
   return (
-    <span
-      style={{
+    <Box
+      sx={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 8,
-        padding: compact ? '5px 10px' : '7px 12px',
-        borderRadius: 999,
+        gap: 0.75,
+        px: compact ? 1.15 : 1.4,
+        py: compact ? 0.6 : 0.8,
+        borderRadius: '999px',
         background: tone.bg,
         color: tone.fg,
-        fontFamily: '"Trebuchet MS", sans-serif',
-        fontSize: compact ? 11 : 12,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
+        border: '1px solid rgba(24,22,26,0.04)'
       }}
     >
-      <span
-        style={{
+      <Box
+        sx={{
           width: 7,
           height: 7,
           borderRadius: '50%',
@@ -43,7 +43,18 @@ export default function StatPill({ label, compact = false }) {
           flex: '0 0 auto'
         }}
       />
-      {label}
-    </span>
+
+      <Typography
+        sx={{
+          fontSize: compact ? 11 : 12,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+          fontWeight: 700,
+          lineHeight: 1
+        }}
+      >
+        {label}
+      </Typography>
+    </Box>
   );
 }

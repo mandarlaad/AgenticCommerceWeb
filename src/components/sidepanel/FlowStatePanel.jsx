@@ -1,8 +1,23 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 import StateCard from './StateCard';
 import { describePlan, friendlyDeclineReason } from '../../lib/planning';
 
-export default function FlowStatePanel({ planState, product, consentRecord, screening, session, eligibility, paymentDraft, token, order, shippingStatus, cartDraft, orderId, bareBonesUi = false }) {
+export default function FlowStatePanel({
+  planState,
+  product,
+  consentRecord,
+  screening,
+  session,
+  eligibility,
+  paymentDraft,
+  token,
+  order,
+  shippingStatus,
+  cartDraft,
+  orderId,
+  bareBonesUi = false
+}) {
   const cards = [
     {
       key: 'planner',
@@ -83,10 +98,21 @@ export default function FlowStatePanel({ planState, product, consentRecord, scre
   ];
 
   return (
-    <div style={{ display: 'grid', gap: 8 }}>
+    <Box sx={{ display: 'grid', gap: 1 }}>
+      <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.5, mb: 0.5 }}>
+        This view tracks the shopper journey from intent parsing through checkout, payment, and fulfillment state.
+      </Typography>
+
       {cards.map((card) => (
-        <StateCard key={card.key} title={card.title} status={card.status} lines={card.lines} emphasis={card.emphasis} bareBonesUi={bareBonesUi} />
+        <StateCard
+          key={card.key}
+          title={card.title}
+          status={card.status}
+          lines={card.lines}
+          emphasis={card.emphasis}
+          bareBonesUi={bareBonesUi}
+        />
       ))}
-    </div>
+    </Box>
   );
 }

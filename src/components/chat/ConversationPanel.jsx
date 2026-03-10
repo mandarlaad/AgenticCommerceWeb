@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { Box, Paper, Typography } from '@mui/material';
 import ControlBar from '../ControlBar';
 import MessageBubble from './MessageBubble';
 import ProductInlineCard from './ProductInlineCard';
@@ -23,40 +24,96 @@ export default function ConversationPanel({
   stageProps
 }) {
   return (
-    <div
-      style={{
-        background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.58)',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-        borderRadius: bareBonesUi ? 6 : 24,
-        padding: minimalUi ? 14 : 18,
+    <Paper
+      elevation={0}
+      sx={{
+        background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.68)',
+        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.10)',
+        borderRadius: bareBonesUi ? '6px' : '24px',
+        p: minimalUi ? 1.5 : 2,
         display: 'grid',
-        gap: 12,
+        gap: 1.5,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
+        boxShadow: bareBonesUi ? 'none' : '0 16px 40px rgba(24,22,26,0.06)',
+        backdropFilter: 'blur(8px)'
       }}
     >
-      <div
-        style={{
-          background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.55)',
-          border: bareBonesUi ? '1px solid #d8d8d8' : '1px solid rgba(24,22,26,0.12)',
-          borderRadius: bareBonesUi ? 4 : 20,
-          padding: 12,
+      <Paper
+        elevation={0}
+        sx={{
+          background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.72)',
+          border: bareBonesUi ? '1px solid #d8d8d8' : '1px solid rgba(24,22,26,0.08)',
+          borderRadius: bareBonesUi ? '4px' : '20px',
+          p: 1.5,
           display: 'grid',
-          gap: 10,
+          gap: 1.25,
           minHeight: 0,
           overflow: 'hidden'
         }}
       >
-        <div style={{ display: 'grid', gap: 12, alignContent: 'start', overflow: 'auto', paddingRight: 6, minHeight: 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 1,
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            pb: 0.5
+          }}
+        >
+          <Box>
+            <Typography
+              variant="overline"
+              sx={{
+                color: 'text.secondary',
+                letterSpacing: '0.14em',
+                fontWeight: 700
+              }}
+            >
+              AI commerce assistant
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Discover products, surface offers, and guide checkout in one conversation.
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 1.5,
+            alignContent: 'start',
+            overflow: 'auto',
+            pr: 0.5,
+            minHeight: 0
+          }}
+        >
           {messages.map((message, index) => (
-            <MessageBubble key={`${message.role}-${index}`} role={message.role} text={message.text} minimalUi={minimalUi} bareBonesUi={bareBonesUi} />
+            <MessageBubble
+              key={`${message.role}-${index}`}
+              role={message.role}
+              text={message.text}
+              minimalUi={minimalUi}
+              bareBonesUi={bareBonesUi}
+            />
           ))}
-          <ProductInlineCard product={product} summary={summary} artwork={artwork} minimalUi={minimalUi} routeMode={routeMode} planState={planState} bareBonesUi={bareBonesUi} />
+
+          <ProductInlineCard
+            product={product}
+            summary={summary}
+            artwork={artwork}
+            minimalUi={minimalUi}
+            routeMode={routeMode}
+            planState={planState}
+            bareBonesUi={bareBonesUi}
+          />
+
           <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
       <ControlBar
         routeMode={routeMode}
@@ -70,6 +127,6 @@ export default function ConversationPanel({
         runtimeReady={routeMode !== 'agentcore' || runtimeReady}
         bareBonesUi={bareBonesUi}
       />
-    </div>
+    </Paper>
   );
 }
