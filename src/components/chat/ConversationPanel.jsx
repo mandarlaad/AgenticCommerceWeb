@@ -101,15 +101,17 @@ export default function ConversationPanel({
             />
           ))}
 
-          <ProductInlineCard
-            product={product}
-            summary={summary}
-            artwork={artwork}
-            minimalUi={minimalUi}
-            routeMode={routeMode}
-            planState={planState}
-            bareBonesUi={bareBonesUi}
-          />
+          {stageProps?.stage !== 'complete' ? (
+            <ProductInlineCard
+              product={product}
+              summary={summary}
+              artwork={artwork}
+              minimalUi={minimalUi}
+              routeMode={routeMode}
+              planState={planState}
+              bareBonesUi={bareBonesUi}
+            />
+          ) : null}
 
           <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
         </Box>

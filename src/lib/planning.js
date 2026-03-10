@@ -1,23 +1,56 @@
 import { palette } from './theme';
 
+// export function parseIntent(userText) {
+//   const text = (userText || '').toLowerCase();
+//   const below = /(under|below|less than|lower than)\s+(\d+)/i.exec(text);
+//   if (below) return { mode: 'below', amount: Number(below[2]) };
+//   const above = /(above|more than|higher than|greater than)\s+(\d+)/i.exec(text);
+//   if (above) return { mode: 'above', amount: Number(above[2]) };
+//   return { mode: 'below', amount: 1200 };
+// }
+
 export function parseIntent(userText) {
   const text = (userText || '').toLowerCase();
-  const below = /(under|below|less than|lower than)\s+(\d+)/i.exec(text);
+
+  const below = /(under|below|less than|lower than)\s+\$?\s*(\d+)/i.exec(text);
   if (below) return { mode: 'below', amount: Number(below[2]) };
-  const above = /(above|more than|higher than|greater than)\s+(\d+)/i.exec(text);
+
+  const budget = /(budget|around|upto|up to|max|maximum)\s+\$?\s*(\d+)/i.exec(text);
+  if (budget) return { mode: 'below', amount: Number(budget[2]) };
+
+  const pricedFor = /\bfor\s+\$?\s*(\d+)\s*\$?\b/i.exec(text);
+  if (pricedFor) return { mode: 'below', amount: Number(pricedFor[1]) };
+
+  const dollarAnywhere = /\$?\s*(\d+)\s*\$/i.exec(text);
+  if (dollarAnywhere) return { mode: 'below', amount: Number(dollarAnywhere[1]) };
+
+  const above = /(above|more than|higher than|greater than)\s+\$?\s*(\d+)/i.exec(text);
   if (above) return { mode: 'above', amount: Number(above[2]) };
+
   return { mode: 'below', amount: 1200 };
 }
 
+// export function extractQuery(userText) {
+//   const text = (userText || '').toLowerCase();
+//   if (/treadmill|fitness|workout/.test(text)) return 'treadmill';
+//   if (/ring|jewelry|diamond/.test(text)) return 'ring';
+//   if (/shoe|sneaker/.test(text)) return 'shoe';
+//   if (/laptop|notebook/.test(text)) return 'laptop';
+//   return '';
+// }
+
 export function extractQuery(userText) {
   const text = (userText || '').toLowerCase();
+
   if (/treadmill|fitness|workout/.test(text)) return 'treadmill';
   if (/ring|jewelry|diamond/.test(text)) return 'ring';
   if (/shoe|sneaker/.test(text)) return 'shoe';
+  if (/jeans|denim/.test(text)) return 'jeans';
+  if (/camera|canon/.test(text)) return 'camera';
   if (/laptop|notebook/.test(text)) return 'laptop';
-  return '';
-}
 
+  return (userText || '').trim();
+}
 export function describePlan(mode, amount) {
   if (mode === 'below' && amount) return `Budget cap under $${amount}`;
   if (mode === 'above' && amount) return `Looking above $${amount}`;

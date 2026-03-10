@@ -1,9 +1,11 @@
-﻿import React from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Box,
   Button,
+  Checkbox,
   Chip,
-  MenuItem,
+  FormControlLabel,
   Paper,
   Stack,
   TextField,
@@ -31,10 +33,26 @@ function Field({ label, children }) {
   );
 }
 
-function monthlyEstimate(price) {
+function monthlyEstimate(price, months = 24) {
   const amount = Number(price || 0);
   if (!amount) return null;
-  return Math.ceil(amount / 24);
+  return Math.ceil(amount / months);
+}
+
+function breadPayEstimate(price) {
+  const amount = Number(price || 0);
+  if (!amount) return null;
+  return Math.ceil(amount / 4);
+}
+
+function randomApr() {
+  const aprs = [14.99, 16.99, 18.99, 20.99, 22.99];
+  return aprs[Math.floor(Math.random() * aprs.length)];
+}
+
+function randomTerm() {
+  const terms = [12, 18, 24];
+  return terms[Math.floor(Math.random() * terms.length)];
 }
 
 function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
@@ -91,9 +109,9 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
           </Box>
 
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            {monthly ? <Chip size="small" color="primary" label={`Pay as low as $${monthly}/mo`} /> : null}
-            <Chip size="small" color="secondary" label="Bread Pay available" />
-            <Chip size="small" variant="outlined" label="Special financing" />
+            {monthly ? <Chip size="small" color="secondary" label={`Bread Credit Card from $${monthly}/mo`} /> : null}
+            <Chip size="small" color="primary" label="Bread Pay available" />
+            <Chip size="small" variant="outlined" label="Prequalify" />
           </Stack>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -117,10 +135,73 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
   );
 }
 
+function ConsentBullet({ title, body }) {
+  return (
+    <Box
+      sx={{
+        p: 1.25,
+        borderRadius: '14px',
+        border: '1px solid rgba(24,22,26,0.08)',
+        background: 'rgba(255,255,255,0.86)'
+      }}
+    >
+      <Typography sx={{ fontWeight: 700, fontSize: 14.5, mb: 0.35 }}>
+        {title}
+      </Typography>
+      <Typography sx={{ color: '#5b6670', lineHeight: 1.45, fontSize: 13.5 }}>
+        {body}
+      </Typography>
+    </Box>
+  );
+}
+
+function OfferCard({ title, subtext, chipText, onClick, primary = false }) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.5,
+        borderRadius: '18px',
+        border: primary ? '1px solid rgba(30,109,116,0.26)' : '1px solid rgba(24,22,26,0.10)',
+        background: primary ? 'linear-gradient(135deg, rgba(30,109,116,0.08) 0%, rgba(255,255,255,1) 100%)' : '#ffffff',
+        display: 'grid',
+        gap: 1
+      }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Typography sx={{ fontSize: 16, fontWeight: 800 }}>
+          {title}
+        </Typography>
+        <Chip size="small" color={primary ? 'secondary' : 'primary'} label={chipText} />
+      </Box>
+
+      <Typography sx={{ color: '#43505e', lineHeight: 1.5 }}>
+        {subtext}
+      </Typography>
+
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <Button
+          onClick={onClick}
+          variant="contained"
+          sx={{
+            borderRadius: '999px',
+            textTransform: 'none',
+            fontWeight: 700,
+            boxShadow: 'none'
+          }}
+        >
+          Choose this offer
+        </Button>
+      </Box>
+    </Paper>
+  );
+}
+
 export default function StageActionCard({
   bareBonesUi = false,
   stage,
   options,
+  product,
   cartDraft,
   setCartDraft,
   paymentDraft,
@@ -129,11 +210,54 @@ export default function StageActionCard({
   loading,
   onSelectProduct,
   onGrantConsent,
+  onSelectFinancingOffer,
+  onContinueAfterSms,
   onContinueToScreening,
   onContinueToPayment,
   onPreparePayment,
   onConfirmCheckout
 }) {
+  const [allowEligibility, setAllowEligibility] = useState(false);
+  const [allowMarketing, setAllowMarketing] = useState(true);
+  const [allowSms, setAllowSms] = useState(false);
+  const [offerSet, setOfferSet] = useState(null);
+
+  useEffect(() => {
+    if (stage === 'consent') {
+      setAllowEligibility(false);
+      setAllowMarketing(true);
+    }
+    if (stage === 'sms') {
+      setAllowSms(false);
+    }
+  }, [stage]);
+
+  useEffect(() => {
+    if (stage === 'offers' && product) {
+      const termMonths = randomTerm();
+      const apr = randomApr();
+      const creditMonthly = monthlyEstimate(product.price, termMonths);
+      const breadPayAmount = breadPayEstimate(product.price);
+
+      setOfferSet({
+        card: {
+          type: 'card',
+          label: 'Bread Credit Card selected',
+          apr,
+          termMonths,
+          monthlyAmount: creditMonthly
+        },
+        breadPay: {
+          type: 'bnpl',
+          label: 'Bread Pay selected',
+          apr: 0,
+          termMonths: 4,
+          monthlyAmount: breadPayAmount
+        }
+      });
+    }
+  }, [stage, product]);
+
   if (!stage || stage === 'idle' || stage === 'complete') return null;
 
   return (
@@ -154,7 +278,7 @@ export default function StageActionCard({
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
         <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
-          Guided checkout step
+          Continue your purchase
         </Typography>
         <StatPill label={stage.replace('_', ' ')} />
       </Box>
@@ -176,25 +300,142 @@ export default function StageActionCard({
               />
             ))}
           </Box>
+
+          <Alert severity="info" sx={{ borderRadius: '16px' }}>
+            <Typography sx={{ fontWeight: 600 }}>
+              Prequalify in seconds. Checking eligibility won’t affect your credit score.
+            </Typography>
+          </Alert>
         </Box>
       ) : null}
 
       {stage === 'consent' ? (
-        <Box sx={{ display: 'grid', gap: 1.25 }}>
-          <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
-            To continue, the assistant needs permission to use shipping, financing, and payment-token details for checkout.
-          </Typography>
+        <Box sx={{ display: 'grid', gap: 1.5 }}>
+          <Box sx={{ display: 'grid', gap: 0.5 }}>
+            <Typography sx={{ fontSize: 19, fontWeight: 800, lineHeight: 1.2 }}>
+              Review permissions to check your offers
+            </Typography>
+            <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
+              To check your available financing offers, we need your permission to use basic shopper details.
+            </Typography>
+          </Box>
 
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            <Chip size="small" variant="outlined" label="Shipping data" />
-            <Chip size="small" variant="outlined" label="Financing data" />
-            <Chip size="small" variant="outlined" label="Payment token data" />
-          </Stack>
+          <Box sx={{ display: 'grid', gap: 1 }}>
+            <ConsentBullet
+              title="Information used for eligibility"
+              body="We’ll use details like your name, email, phone number, and address to check available financing offers for this purchase."
+            />
+            <ConsentBullet
+              title="Marketing preferences"
+              body="You can also allow marketing communications so relevant offers and future updates can be shared with you later."
+            />
+          </Box>
+
+          <Box
+            sx={{
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, rgba(30,109,116,0.08) 0%, rgba(205,91,46,0.08) 100%)',
+              border: '1px solid rgba(24,22,26,0.08)',
+              p: 1.25
+            }}
+          >
+            <Stack spacing={0.5}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={allowEligibility}
+                    onChange={(e) => setAllowEligibility(e.target.checked)}
+                  />
+                }
+                label="I allow my information to be used to check available financing offers."
+              />
+
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={allowMarketing}
+                    onChange={(e) => setAllowMarketing(e.target.checked)}
+                  />
+                }
+                label="I’d like to receive marketing communications and future offer updates. (Optional)"
+              />
+            </Stack>
+          </Box>
+
+          <Alert severity="success" sx={{ borderRadius: '16px' }}>
+            <Typography sx={{ fontWeight: 600 }}>
+              Checking eligibility is quick and won’t affect your credit score.
+            </Typography>
+          </Alert>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
             <Button
               onClick={onGrantConsent}
-              disabled={loading}
+              disabled={loading || !allowEligibility}
+              variant="contained"
+              sx={{
+                borderRadius: '999px',
+                textTransform: 'none',
+                fontWeight: 700,
+                boxShadow: 'none',
+                px: 2.25
+              }}
+            >
+              Check my offers
+            </Button>
+          </Box>
+        </Box>
+      ) : null}
+
+      {stage === 'offers' && offerSet ? (
+        <Box sx={{ display: 'grid', gap: 1.25 }}>
+          <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
+            Here are the financing options available for this purchase. Choose the one you want to continue with.
+          </Typography>
+
+          <OfferCard
+            title="Bread Credit Card"
+            chipText={`from $${offerSet.card.monthlyAmount}/mo`}
+            subtext={`${offerSet.card.termMonths} monthly payments at ${offerSet.card.apr}% APR for this purchase.`}
+            primary
+            onClick={() => onSelectFinancingOffer(offerSet.card)}
+          />
+
+          <OfferCard
+            title="Bread Pay"
+            chipText={`4 payments of $${offerSet.breadPay.monthlyAmount}`}
+            subtext="Split your purchase into four payments with a shorter-term pay-over-time option."
+            onClick={() => onSelectFinancingOffer(offerSet.breadPay)}
+          />
+        </Box>
+      ) : null}
+
+      {stage === 'sms' ? (
+        <Box sx={{ display: 'grid', gap: 1.5 }}>
+          <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
+            To continue with {paymentDraft.railPreference === 'card' ? 'Bread Credit Card' : 'Bread Pay'}, we’ll send a secure verification link to your phone.
+          </Typography>
+
+          <Alert severity="info" sx={{ borderRadius: '16px' }}>
+            <Typography sx={{ fontWeight: 600 }}>
+              This secure link helps confirm your identity, validate the device, and continue the financing request.
+            </Typography>
+          </Alert>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={allowSms}
+                onChange={(e) => setAllowSms(e.target.checked)}
+              />
+            }
+            label="I agree to receive a one-time secure verification link by SMS."
+          />
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Button
+              onClick={onContinueAfterSms}
+              disabled={!allowSms || loading}
               variant="contained"
               sx={{
                 borderRadius: '999px',
@@ -203,7 +444,7 @@ export default function StageActionCard({
                 boxShadow: 'none'
               }}
             >
-              Grant consent
+              Send secure link
             </Button>
           </Box>
         </Box>
@@ -293,7 +534,7 @@ export default function StageActionCard({
                 boxShadow: 'none'
               }}
             >
-              Continue to identity and fraud checks
+              Continue
             </Button>
           </Box>
         </Box>
@@ -326,7 +567,7 @@ export default function StageActionCard({
                 boxShadow: 'none'
               }}
             >
-              Continue to payment preparation
+              Continue
             </Button>
           </Box>
         </Box>
@@ -335,26 +576,18 @@ export default function StageActionCard({
       {stage === 'payment' ? (
         <Box sx={{ display: 'grid', gap: 1.5 }}>
           <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
-            Choose the preferred payment rail and prepare the checkout session.
+            {paymentDraft.railPreference === 'card'
+              ? `You selected Bread Credit Card with ${paymentDraft.termMonths || '--'} months financing at ${paymentDraft.apr || '--'}% APR.`
+              : `You selected Bread Pay with estimated payments of $${paymentDraft.monthlyAmount || '--'} over 4 payments.`}
           </Typography>
 
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.25 }}>
-            <Field label="Preferred rail">
-              <TextField
-                select
-                size="small"
-                value={paymentDraft.railPreference}
-                onChange={(e) => setPaymentDraft((draft) => ({ ...draft, railPreference: e.target.value }))}
-              >
-                <MenuItem value="bnpl">BNPL</MenuItem>
-                <MenuItem value="card">Card</MenuItem>
-              </TextField>
-            </Field>
-
-            <Field label="Order quantity">
-              <TextField size="small" value={String(cartDraft.qty)} disabled />
-            </Field>
-          </Box>
+          <Field label="Selected payment option">
+            <TextField
+              size="small"
+              value={paymentDraft.railPreference === 'card' ? 'Bread Credit Card' : 'Bread Pay'}
+              disabled
+            />
+          </Field>
 
           <Field label="Customer note">
             <TextField
@@ -365,7 +598,8 @@ export default function StageActionCard({
           </Field>
 
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            <Chip size="small" color="primary" label="Financing offer available" />
+            <Chip size="small" color="secondary" label="Bread Credit Card available" />
+            <Chip size="small" color="primary" label="Bread Pay available" />
             <Chip size="small" variant="outlined" label="Tokenized checkout" />
           </Stack>
 
@@ -381,7 +615,7 @@ export default function StageActionCard({
                 boxShadow: 'none'
               }}
             >
-              Prepare payment and checkout session
+              Prepare checkout
             </Button>
           </Box>
         </Box>
@@ -390,12 +624,12 @@ export default function StageActionCard({
       {stage === 'confirm' ? (
         <Box sx={{ display: 'grid', gap: 1.25 }}>
           <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
-            The product, shipping, screening, and tokenized payment are ready. Confirm to complete checkout.
+            Everything is ready. Confirm to complete your purchase.
           </Typography>
 
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            <Chip size="small" color="primary" label="Ready for payment" />
-            <Chip size="small" color="secondary" label="Bread Pay prepared" />
+            <Chip size="small" color="secondary" label="Bread Credit Card ready" />
+            <Chip size="small" color="primary" label="Bread Pay ready" />
           </Stack>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>

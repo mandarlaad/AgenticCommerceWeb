@@ -75,7 +75,7 @@ function shopperFacingRouteStatus(order, shippingStatus) {
 export default function AppShell() {
   const [minimalUi, setMinimalUi] = useState(defaultMinimalUi);
   const [bareBonesUi, setBareBonesUi] = useState(defaultBareBonesUi);
-  const [runtimeArn, setRuntimeArn] = useState(() => localStorage.getItem('agentcore-runtime-arn') || defaultRuntimeArn);
+  const [runtimeArn, setRuntimeArn] = useState(() => defaultRuntimeArn || localStorage.getItem('agentcore-runtime-arn') || '');
   const [runtimeRegion] = useState(defaultRuntimeRegion);
   const [runtimeQualifier] = useState(defaultRuntimeQualifier);
   const [prompt, setPrompt] = useState('suggest treadmills under 1200; offer financing');
@@ -100,7 +100,14 @@ export default function AppShell() {
     }
   });
   const [screening, setScreening] = useState(null);
-  const [paymentDraft, setPaymentDraft] = useState({ railPreference: 'bnpl', detailsLabel: 'BNPL approval requested' });
+  // const [paymentDraft, setPaymentDraft] = useState({ railPreference: 'card', detailsLabel: 'Credit Card approval requested' });
+  const [paymentDraft, setPaymentDraft] = useState({
+  railPreference: 'card',
+  detailsLabel: 'Bread Credit Card selected',
+  apr: '',
+  termMonths: '',
+  monthlyAmount: ''
+});
   const [session, setSession] = useState(null);
   const [eligibility, setEligibility] = useState(null);
   const [token, setToken] = useState(null);
@@ -178,7 +185,14 @@ export default function AppShell() {
     setShippingStatus('');
     setPlanState(null);
     setCartDraft({ qty: 1, shippingAddress: { line1: '1 Hackathon Way', city: 'Columbus', region: 'OH', postalCode: '43004' } });
-    setPaymentDraft({ railPreference: 'bnpl', detailsLabel: 'BNPL approval requested' });
+    // setPaymentDraft({ railPreference: 'bnpl', detailsLabel: 'BNPL approval requested' });
+   setPaymentDraft({
+      railPreference: 'card',
+      detailsLabel: 'Bread Credit Card selected',
+      apr: '',
+      termMonths: '',
+      monthlyAmount: ''
+    });
     setActivePanel('state');
     setShowWorkspace(false);
   }
@@ -207,8 +221,7 @@ export default function AppShell() {
       };
       setPlanState(plan);
       pushTrace('planner.intent', 'LOCAL', 'prompt -> structured plan', 'OK', { surfaceMode: 'react_ui', query, maxPrice: plan.maxPrice });
-      pushMessage('assistant', `I parsed your request as ${describePlan(plan.mode, plan.amount)} for ${query}. I am searching the merchant catalog and will shortlist options in the chat.`);
-
+      pushMessage('assistant', `Got it — I’m looking for ${query}${plan.mode === 'below' && plan.amount ? ` under $${plan.amount}` : ''}. I’ll show you the best matches here.`);
       const searchParams = new URLSearchParams();
       searchParams.set('q', query);
       if (plan.mode === 'below' && plan.amount) searchParams.set('maxPrice', String(plan.amount));
@@ -235,18 +248,50 @@ export default function AppShell() {
     setProduct(selected);
     setFlowStage('consent');
     pushMessage('user', `Proceed with ${selected.name} at $${selected.price}.`);
-    pushMessage('assistant', 'To continue, I need consent to use shipping, financing, and payment-token data for checkout.');
-  }
+    pushMessage('assistant', 'To continue, please review and approve the information-sharing permissions below so I can check your available financing offers.');  }
 
   function grantConsent() {
-    const record = { consentId: `cons_${Date.now()}`, status: 'GRANTED', scopes: ['shipping', 'financing', 'payments'] };
+    const record = {
+      consentId: `cons_${Date.now()}`,
+      status: 'GRANTED',
+      scopes: ['shipping', 'financing', 'payments', 'marketing_preferences']
+    };
     setConsentRecord(record);
-    setFlowStage('cart');
+    setFlowStage('offers');
     pushTrace('consents.create', 'LOCAL', 'consent -> shopper approval', 201, { surfaceMode: 'ui_simulated' });
-    pushMessage('user', 'I consent to data use for checkout.');
-    pushMessage('assistant', 'Consent recorded. Confirm quantity and shipping details in the next card.');
+    pushMessage('user', 'I approve the requested permissions and want to continue.');
+    pushMessage('assistant', 'Thanks — I checked your eligibility and found available financing offers for this purchase. Pick the option you want to continue with.');
   }
 
+  function selectFinancingOffer(selectedOffer) {
+  setPaymentDraft({
+    railPreference: selectedOffer.type,
+    detailsLabel: selectedOffer.label,
+    apr: selectedOffer.apr,
+    termMonths: selectedOffer.termMonths,
+    monthlyAmount: selectedOffer.monthlyAmount
+  });
+
+  setFlowStage('sms');
+
+  pushMessage(
+    'user',
+    `I want to continue with ${selectedOffer.type === 'card' ? 'Bread Credit Card' : 'Bread Pay'}.`
+  );
+
+  pushMessage(
+    'assistant',
+    selectedOffer.type === 'card'
+      ? `Great choice — you selected Bread Credit Card with ${selectedOffer.termMonths} months financing at ${selectedOffer.apr}% APR. To continue, we’ll send a secure verification link to your phone.`
+      : `Great choice — you selected Bread Pay with estimated payments of $${selectedOffer.monthlyAmount}. To continue, we’ll send a secure verification link to your phone.`
+  );
+}
+
+  function continueAfterSms() {
+    setFlowStage('cart');
+    pushMessage('user', 'Send the secure verification link to my phone.');
+    pushMessage('assistant', 'A secure verification link has been sent to your phone. For now, continue with shipping details while the secure verification page is being mocked into the flow.');
+  }
   function continueToScreening() {
     const result = screeningFromDraft(product, cartDraft);
     setScreening(result);
@@ -523,22 +568,25 @@ export default function AppShell() {
             summary={summary}
             artwork={artwork}
             planState={planState}
-            stageProps={{
-              stage: routeMode === 'acp' ? flowStage : 'idle',
-              options,
-              cartDraft,
-              setCartDraft,
-              paymentDraft,
-              setPaymentDraft,
-              screening,
-              loading,
-              onSelectProduct: confirmProductChoice,
-              onGrantConsent: grantConsent,
-              onContinueToScreening: continueToScreening,
-              onContinueToPayment: continueToPayment,
-              onPreparePayment: preparePayment,
-              onConfirmCheckout: confirmAndCheckout
-            }}
+       stageProps={{
+                  stage: routeMode === 'acp' ? flowStage : 'idle',
+                  options,
+                  product,
+                  cartDraft,
+                  setCartDraft,
+                  paymentDraft,
+                  setPaymentDraft,
+                  screening,
+                  loading,
+                  onSelectProduct: confirmProductChoice,
+                  onGrantConsent: grantConsent,
+                  onSelectFinancingOffer: selectFinancingOffer,
+                  onContinueAfterSms: continueAfterSms,
+                  onContinueToScreening: continueToScreening,
+                  onContinueToPayment: continueToPayment,
+                  onPreparePayment: preparePayment,
+                  onConfirmCheckout: confirmAndCheckout
+                }}
           />
 
           {showWorkspace ? (
