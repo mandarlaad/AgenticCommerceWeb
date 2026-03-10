@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import logo from '../images/logo.png';
-import { Box, Button } from '@mui/material';
+import { Avatar, Box, Button, Chip, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import ConversationPanel from '../components/chat/ConversationPanel';
 import SideWorkspace from '../components/sidepanel/SideWorkspace';
 import { fetchJson } from '../lib/api';
 import { defaultBareBonesUi, defaultMinimalUi, defaultRuntimeArn, defaultRuntimeQualifier, defaultRuntimeRegion } from '../lib/config';
 import { toolContractMap } from '../lib/contracts';
 import {
-  completionMessage,
   describePlan,
   extractQuery,
   parseIntent,
@@ -15,6 +14,8 @@ import {
   screeningFromDraft
 } from '../lib/planning';
 import { panelStyle, palette, shellStyle } from '../lib/theme';
+import mockProfiles from '../lib/mockProfiles';
+import logo from '../images/logo.png';
 
 const API_BASE = '/api';
 
@@ -90,24 +91,24 @@ export default function AppShell() {
   const [flowStage, setFlowStage] = useState('idle');
   const [product, setProduct] = useState(null);
   const [consentRecord, setConsentRecord] = useState(null);
+  const [currentProfile] = useState(() => mockProfiles[Math.floor(Math.random() * mockProfiles.length)]);
   const [cartDraft, setCartDraft] = useState({
     qty: 1,
     shippingAddress: {
-      line1: '1 Hackathon Way',
-      city: 'Columbus',
-      region: 'OH',
-      postalCode: '43004'
+      line1: currentProfile.shippingAddress.line1,
+      city: currentProfile.shippingAddress.city,
+      region: currentProfile.shippingAddress.region,
+      postalCode: currentProfile.shippingAddress.postalCode
     }
   });
   const [screening, setScreening] = useState(null);
-  // const [paymentDraft, setPaymentDraft] = useState({ railPreference: 'card', detailsLabel: 'Credit Card approval requested' });
   const [paymentDraft, setPaymentDraft] = useState({
-  railPreference: 'card',
-  detailsLabel: 'Bread Credit Card selected',
-  apr: '',
-  termMonths: '',
-  monthlyAmount: ''
-});
+    railPreference: 'card',
+    detailsLabel: 'Bread Credit Card selected',
+    apr: '',
+    termMonths: '',
+    monthlyAmount: ''
+  });
   const [session, setSession] = useState(null);
   const [eligibility, setEligibility] = useState(null);
   const [token, setToken] = useState(null);
@@ -117,6 +118,7 @@ export default function AppShell() {
   const [showProtocolTrace, setShowProtocolTrace] = useState(true);
   const [activePanel, setActivePanel] = useState('state');
   const [showWorkspace, setShowWorkspace] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const orderId = order?.orderId || session?.checkoutSessionId || session?.sessionId || '';
 
@@ -184,9 +186,16 @@ export default function AppShell() {
     setOrder(null);
     setShippingStatus('');
     setPlanState(null);
-    setCartDraft({ qty: 1, shippingAddress: { line1: '1 Hackathon Way', city: 'Columbus', region: 'OH', postalCode: '43004' } });
-    // setPaymentDraft({ railPreference: 'bnpl', detailsLabel: 'BNPL approval requested' });
-   setPaymentDraft({
+    setCartDraft({
+      qty: 1,
+      shippingAddress: {
+        line1: currentProfile.shippingAddress.line1,
+        city: currentProfile.shippingAddress.city,
+        region: currentProfile.shippingAddress.region,
+        postalCode: currentProfile.shippingAddress.postalCode
+      }
+    });
+    setPaymentDraft({
       railPreference: 'card',
       detailsLabel: 'Bread Credit Card selected',
       apr: '',
@@ -208,7 +217,7 @@ export default function AppShell() {
     try {
       const intent = parseIntent(prompt);
       const query = extractQuery(prompt) || prompt;
-      const requestedRailPreference = /finance|installment|bnpl/i.test(prompt) ? 'bnpl' : 'card';
+      const requestedRailPreference = /finance|installment|bread pay|breadpay|card/i.test(prompt) ? 'card' : 'card';
       const plan = {
         source: 'react-surface',
         mode: intent.mode,
@@ -222,6 +231,7 @@ export default function AppShell() {
       setPlanState(plan);
       pushTrace('planner.intent', 'LOCAL', 'prompt -> structured plan', 'OK', { surfaceMode: 'react_ui', query, maxPrice: plan.maxPrice });
       pushMessage('assistant', `Got it — I’m looking for ${query}${plan.mode === 'below' && plan.amount ? ` under $${plan.amount}` : ''}. I’ll show you the best matches here.`);
+
       const searchParams = new URLSearchParams();
       searchParams.set('q', query);
       if (plan.mode === 'below' && plan.amount) searchParams.set('maxPrice', String(plan.amount));
@@ -235,7 +245,8 @@ export default function AppShell() {
 
       setOptions(shortlist);
       setFlowStage('options');
-      pushMessage('assistant', `I found ${shortlist.length} candidate options. Review the shortlist below and confirm the product you want to continue with.`);
+      pushMessage('assistant', `I found ${shortlist.length} matching options. Review the shortlist below and pick the one you want.`);
+
     } catch (err) {
       setError(err.message || String(err));
       pushMessage('assistant', `Flow failed: ${err.message || String(err)}`);
@@ -248,7 +259,8 @@ export default function AppShell() {
     setProduct(selected);
     setFlowStage('consent');
     pushMessage('user', `Proceed with ${selected.name} at $${selected.price}.`);
-    pushMessage('assistant', 'To continue, please review and approve the information-sharing permissions below so I can check your available financing offers.');  }
+    pushMessage('assistant', 'To continue, please review and approve the information-sharing permissions below so I can check your available financing offers.');
+  }
 
   function grantConsent() {
     const record = {
@@ -264,47 +276,52 @@ export default function AppShell() {
   }
 
   function selectFinancingOffer(selectedOffer) {
-  setPaymentDraft({
-    railPreference: selectedOffer.type,
-    detailsLabel: selectedOffer.label,
-    apr: selectedOffer.apr,
-    termMonths: selectedOffer.termMonths,
-    monthlyAmount: selectedOffer.monthlyAmount
-  });
+    setPaymentDraft({
+      railPreference: selectedOffer.type,
+      detailsLabel: selectedOffer.label,
+      apr: selectedOffer.apr,
+      termMonths: selectedOffer.termMonths,
+      monthlyAmount: selectedOffer.monthlyAmount
+    });
 
-  setFlowStage('sms');
+    setFlowStage('sms');
 
-  pushMessage(
-    'user',
-    `I want to continue with ${selectedOffer.type === 'card' ? 'Bread Credit Card' : 'Bread Pay'}.`
-  );
+    pushMessage(
+      'user',
+      `I want to continue with ${selectedOffer.type === 'card' ? 'Bread Credit Card' : 'Bread Pay'}.`
+    );
 
-  pushMessage(
-    'assistant',
-    selectedOffer.type === 'card'
-      ? `Great choice — you selected Bread Credit Card with ${selectedOffer.termMonths} months financing at ${selectedOffer.apr}% APR. To continue, we’ll send a secure verification link to your phone.`
-      : `Great choice — you selected Bread Pay with estimated payments of $${selectedOffer.monthlyAmount}. To continue, we’ll send a secure verification link to your phone.`
-  );
-}
+    pushMessage(
+      'assistant',
+      selectedOffer.type === 'card'
+        ? `Great choice — you selected Bread Credit Card with ${selectedOffer.termMonths} months financing at ${selectedOffer.apr}% APR. To continue, we’ll send a secure verification link to your phone.`
+        : `Great choice — you selected Bread Pay with estimated payments of $${selectedOffer.monthlyAmount}. To continue, we’ll send a secure verification link to your phone.`
+    );
+  }
 
   function continueAfterSms() {
-    setFlowStage('cart');
-    pushMessage('user', 'Send the secure verification link to my phone.');
-    pushMessage('assistant', 'A secure verification link has been sent to your phone. For now, continue with shipping details while the secure verification page is being mocked into the flow.');
+    setFlowStage('approved');
+
+    pushMessage(
+      'assistant',
+      `Great news — you're approved for this purchase using ${
+        paymentDraft.railPreference === 'card'
+          ? 'Bread Credit Card financing'
+          : 'Bread Pay'
+      }. Review your order below and complete checkout.`
+    );
   }
+
   function continueToScreening() {
     const result = screeningFromDraft(product, cartDraft);
     setScreening(result);
     setFlowStage('screening');
     pushTrace('identity.screen', 'LOCAL', 'identity verification', 200, { surfaceMode: 'ui_simulated', identityStatus: result.identityStatus });
     pushTrace('fraud.screen', 'LOCAL', 'fraud screening', 200, { surfaceMode: 'ui_simulated', fraudStatus: result.fraudStatus, riskScore: result.riskScore });
-    pushMessage('user', `Ship ${cartDraft.qty} unit(s) to ${cartDraft.shippingAddress.line1}, ${cartDraft.shippingAddress.city}.`);
-    pushMessage('assistant', `Identity is ${result.identityStatus.toLowerCase()} and fraud screening is ${result.fraudStatus.toLowerCase()}. ${result.recommendation}`);
   }
 
   function continueToPayment() {
     setFlowStage('payment');
-    pushMessage('assistant', 'Next I will prepare the checkout session, financing eligibility, and tokenized payment details.');
   }
 
   async function preparePayment() {
@@ -355,7 +372,6 @@ export default function AppShell() {
       setToken(tokenizeResponse.body);
       setPaymentDraft((draft) => ({ ...draft, railPreference: chosenRail }));
       setFlowStage('confirm');
-      pushMessage('assistant', `Checkout session is ready and ${chosenRail.toUpperCase()} payment details are prepared. Review and confirm the order when you are ready.`);
     } catch (err) {
       setError(err.message || String(err));
       pushMessage('assistant', `Flow failed: ${err.message || String(err)}`);
@@ -368,20 +384,33 @@ export default function AppShell() {
     setLoading(true);
     try {
       const completeKey = `ui-complete-${Date.now()}`;
-      const sessionId = session?.checkoutSessionId || session?.sessionId;
-      const instrument = token?.instrument || { token: token?.token, type: paymentDraft.railPreference };
+      const sessionId = session?.checkoutSessionId || session?.sessionId || `session-${Date.now()}`;
+      const instrument = token?.instrument || { token: token?.token || `tok_${Date.now()}`, type: paymentDraft.railPreference };
       const completeBody = { sessionId, paymentToken: instrument.token, instrument };
-      const completeResponse = await fetchJson(`${API_BASE}/checkout_sessions/${sessionId}/complete`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': completeKey },
-        body: JSON.stringify(completeBody)
-      });
-      pushTrace('checkout_sessions.complete', 'POST', `${API_BASE}/checkout_sessions/${sessionId}/complete`, completeResponse.status, { idempotencyKey: completeKey });
-      const result = completeResponse.body;
-      setOrder(result);
-      setShippingStatus(result.status || '');
+
+      let result = null;
+
+      try {
+        const completeResponse = await fetchJson(`${API_BASE}/checkout_sessions/${sessionId}/complete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Idempotency-Key': completeKey },
+          body: JSON.stringify(completeBody)
+        });
+        pushTrace('checkout_sessions.complete', 'POST', `${API_BASE}/checkout_sessions/${sessionId}/complete`, completeResponse.status, { idempotencyKey: completeKey });
+        result = completeResponse.body || {};
+      } catch (e) {
+        result = {};
+      }
+
+      const normalizedResult = {
+        ...result,
+        orderId: result?.orderId || `BFH-${String(Date.now()).slice(-6)}`,
+        status: /DECLINED|FAILED|ERROR/i.test(result?.status || '') ? 'DECLINED' : 'CONFIRMED'
+      };
+
+      setOrder(normalizedResult);
+      setShippingStatus(normalizedResult.status || '');
       setFlowStage('complete');
-      pushMessage('assistant', completionMessage(result, product, eligibility?.preferredRail || paymentDraft.railPreference));
     } catch (err) {
       setError(err.message || String(err));
       pushMessage('assistant', `Flow failed: ${err.message || String(err)}`);
@@ -407,11 +436,6 @@ export default function AppShell() {
     }));
     setTrace(runtimeTrace);
     if (result.order?.orderId) setSession({ checkoutSessionId: result.order.orderId, sessionId: result.order.orderId, status: result.order.status });
-    if (result.product && result.order) {
-      pushMessage('assistant', completionMessage(result.order, result.product, result.rail));
-    } else {
-      pushMessage('assistant', 'AgentCore runtime completed, but the response did not include a final order.');
-    }
   }
 
   async function runRuntimeFlow() {
@@ -458,7 +482,6 @@ export default function AppShell() {
     pushTrace('fulfillment.simulate', 'POST', `${API_BASE}/fulfillment/simulate`, response.status);
     if (response.ok) {
       setShippingStatus(response.body.status || 'IN_TRANSIT');
-      pushMessage('assistant', `Shipment lifecycle advanced to ${response.body.status || 'IN_TRANSIT'}.`);
     }
   }
 
@@ -485,58 +508,59 @@ export default function AppShell() {
             marginBottom: 12
           }}
         >
-         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start', flexWrap: 'wrap' }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
- <img
-  src={logo}
-  alt="logo"
-  style={{
-    height:186,
-    width: 'auto',
-    objectFit: 'contain'
-  }}
-/>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'start', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <img
+                src={logo}
+                alt="logo"
+                style={{
+                  height: 64,
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
 
-        <div>
-          <div
-            style={{
-              fontFamily: bareBonesUi ? '"Segoe UI", Arial, sans-serif' : '"Trebuchet MS", sans-serif',
-              fontSize: 11,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: palette.slate,
-              marginBottom: 8
-            }}
-          >
-            Agentic Commerce / ACP surface
+              <div>
+                <div
+                  style={{
+                    fontFamily: bareBonesUi ? '"Segoe UI", Arial, sans-serif' : '"Trebuchet MS", sans-serif',
+                    fontSize: 11,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: palette.slate,
+                    marginBottom: 8
+                  }}
+                >
+                  Agentic Commerce / ACP surface
+                </div>
+
+                <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
+                  Chat-guided checkout with protocol trace.
+                </h1>
+
+                <p style={{ margin: '8px 0 0', maxWidth: 760, fontSize: minimalUi ? 15 : 18, color: 'rgba(24,22,26,0.78)' }}>
+                  {heroCopy}
+                </p>
+              </div>
+            </div>
+
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+              <Chip
+                label={
+                  currentProfile.customerType === 'existing'
+                    ? 'Existing customer'
+                    : currentProfile.customerType === 'risk'
+                      ? 'Risk profile'
+                      : 'New customer'
+                }
+                color={currentProfile.customerType === 'existing' ? 'secondary' : currentProfile.customerType === 'risk' ? 'warning' : 'primary'}
+                variant="outlined"
+              />
+              <IconButton onClick={() => setProfileOpen(true)}>
+                <AccountCircleRoundedIcon sx={{ fontSize: 34 }} />
+              </IconButton>
+            </Stack>
           </div>
-
-          <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
-            Chat-guided checkout with protocol trace.
-          </h1>
-
-          <p style={{ margin: '8px 0 0', maxWidth: 760, fontSize: minimalUi ? 15 : 18, color: 'rgba(24,22,26,0.78)' }}>
-            {heroCopy}
-          </p>
-        </div>
-      </div>
-
-          {/* <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <Button
-              variant={showWorkspace ? 'contained' : 'outlined'}
-              onClick={() => setShowWorkspace((prev) => !prev)}
-              sx={{
-                borderRadius: '999px',
-                px: 2,
-                py: 1,
-                boxShadow: 'none'
-              }}
-            >
-              {showWorkspace ? 'Hide agent steps' : 'Show agent steps'}
-            </Button>
-          </div> */}
-          <div />
-        </div>
         </section>
 
         <section
@@ -568,25 +592,27 @@ export default function AppShell() {
             summary={summary}
             artwork={artwork}
             planState={planState}
-       stageProps={{
-                  stage: routeMode === 'acp' ? flowStage : 'idle',
-                  options,
-                  product,
-                  cartDraft,
-                  setCartDraft,
-                  paymentDraft,
-                  setPaymentDraft,
-                  screening,
-                  loading,
-                  onSelectProduct: confirmProductChoice,
-                  onGrantConsent: grantConsent,
-                  onSelectFinancingOffer: selectFinancingOffer,
-                  onContinueAfterSms: continueAfterSms,
-                  onContinueToScreening: continueToScreening,
-                  onContinueToPayment: continueToPayment,
-                  onPreparePayment: preparePayment,
-                  onConfirmCheckout: confirmAndCheckout
-                }}
+            stageProps={{
+              stage: routeMode === 'acp' ? flowStage : 'idle',
+              options,
+              product,
+              currentProfile,
+              order,
+              cartDraft,
+              setCartDraft,
+              paymentDraft,
+              setPaymentDraft,
+              screening,
+              loading,
+              onSelectProduct: confirmProductChoice,
+              onGrantConsent: grantConsent,
+              onSelectFinancingOffer: selectFinancingOffer,
+              onContinueAfterSms: continueAfterSms,
+              onContinueToScreening: continueToScreening,
+              onContinueToPayment: continueToPayment,
+              onPreparePayment: preparePayment,
+              onConfirmCheckout: confirmAndCheckout
+            }}
           />
 
           {showWorkspace ? (
@@ -621,44 +647,98 @@ export default function AppShell() {
             />
           ) : null}
         </section>
+
+        <Drawer anchor="right" open={profileOpen} onClose={() => setProfileOpen(false)}>
+          <Box sx={{ width: 360, p: 2.25, display: 'grid', gap: 1.5 }}>
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <Avatar sx={{ width: 48, height: 48 }}>
+                {currentProfile.firstName[0]}
+                {currentProfile.lastName[0]}
+              </Avatar>
+              <Box>
+                <Typography sx={{ fontWeight: 800 }}>
+                  {currentProfile.firstName} {currentProfile.lastName}
+                </Typography>
+                <Typography sx={{ color: 'text.secondary' }}>
+                  {currentProfile.customerType === 'existing'
+                    ? 'Existing customer profile'
+                    : currentProfile.customerType === 'risk'
+                      ? 'High-risk profile'
+                      : 'New customer profile'}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Divider />
+
+            <Box sx={{ display: 'grid', gap: 1 }}>
+              <Typography sx={{ fontWeight: 700 }}>Saved profile details</Typography>
+              <Typography><strong>Email:</strong> {currentProfile.email}</Typography>
+              <Typography><strong>Phone:</strong> {currentProfile.phone}</Typography>
+              <Typography>
+                <strong>Address:</strong> {currentProfile.shippingAddress.line1}, {currentProfile.shippingAddress.city}, {currentProfile.shippingAddress.region} {currentProfile.shippingAddress.postalCode}
+              </Typography>
+              {currentProfile.cardLast4 ? (
+                <Typography><strong>Bread card:</strong> ending in {currentProfile.cardLast4}</Typography>
+              ) : null}
+            </Box>
+
+            <Divider />
+
+            <Box sx={{ display: 'grid', gap: 1 }}>
+              <Typography sx={{ fontWeight: 700 }}>Available for consent sharing</Typography>
+              <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                <Chip label="First name" size="small" />
+                <Chip label="Last name" size="small" />
+                <Chip label="Email" size="small" />
+                <Chip label="Phone" size="small" />
+                <Chip label="Address" size="small" />
+              </Stack>
+              <Typography sx={{ color: 'text.secondary', fontSize: 13.5, lineHeight: 1.5 }}>
+                These saved profile details can be shared only with your permission during eligibility and checkout.
+              </Typography>
+            </Box>
+          </Box>
+        </Drawer>
+
         <Box
+          sx={{
+            position: 'fixed',
+            right: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 1300,
+            display: 'flex',
+            alignItems: 'center'
+          }}
+        >
+          <Button
+            onClick={() => setShowWorkspace((prev) => !prev)}
+            variant="contained"
             sx={{
-              position: 'fixed',
-              right: 0,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 1300,
-              display: 'flex',
-              alignItems: 'center'
+              minWidth: 'unset',
+              px: 1.1,
+              py: 1.6,
+              borderRadius: '16px 0 0 16px',
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              textTransform: 'none',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              boxShadow: '0 12px 28px rgba(24,22,26,0.16)',
+              background: showWorkspace
+                ? 'linear-gradient(180deg, #cd5b2e 0%, #b44e25 100%)'
+                : 'linear-gradient(180deg, #1e6d74 0%, #275a67 100%)',
+              '&:hover': {
+                background: showWorkspace
+                  ? 'linear-gradient(180deg, #c2552c 0%, #a94922 100%)'
+                  : 'linear-gradient(180deg, #1b646a 0%, #234f5b 100%)'
+              }
             }}
           >
-            <Button
-              onClick={() => setShowWorkspace((prev) => !prev)}
-              variant="contained"
-              sx={{
-                minWidth: 'unset',
-                px: 1.1,
-                py: 1.6,
-                borderRadius: '16px 0 0 16px',
-                writingMode: 'vertical-rl',
-                textOrientation: 'mixed',
-                textTransform: 'none',
-                fontWeight: 700,
-                letterSpacing: '0.04em',
-                boxShadow: '0 12px 28px rgba(24,22,26,0.16)',
-                background: showWorkspace
-                  ? 'linear-gradient(180deg, #cd5b2e 0%, #b44e25 100%)'
-                  : 'linear-gradient(180deg, #1e6d74 0%, #275a67 100%)',
-                '&:hover': {
-                  background: showWorkspace
-                    ? 'linear-gradient(180deg, #c2552c 0%, #a94922 100%)'
-                    : 'linear-gradient(180deg, #1b646a 0%, #234f5b 100%)'
-                }
-              }}
-            >
-              {showWorkspace ? 'Hide agent steps' : 'Agent steps'}
-            </Button>
-          </Box>
+            {showWorkspace ? 'Hide agent steps' : 'Agent steps'}
+          </Button>
+        </Box>
       </div>
     </div>
   );

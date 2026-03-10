@@ -4,6 +4,7 @@ import ControlBar from '../ControlBar';
 import MessageBubble from './MessageBubble';
 import ProductInlineCard from './ProductInlineCard';
 import StageActionCard from './StageActionCard';
+import OrderConfirmationCard from './OrderConfirmationCard';
 
 export default function ConversationPanel({
   minimalUi,
@@ -23,6 +24,8 @@ export default function ConversationPanel({
   planState,
   stageProps
 }) {
+  const isComplete = stageProps?.stage === 'complete';
+
   return (
     <Paper
       elevation={0}
@@ -91,29 +94,40 @@ export default function ConversationPanel({
             minHeight: 0
           }}
         >
-          {messages.map((message, index) => (
-            <MessageBubble
-              key={`${message.role}-${index}`}
-              role={message.role}
-              text={message.text}
-              minimalUi={minimalUi}
-              bareBonesUi={bareBonesUi}
-            />
-          ))}
-
-          {stageProps?.stage !== 'complete' ? (
-            <ProductInlineCard
+          {isComplete ? (
+            <OrderConfirmationCard
               product={product}
-              summary={summary}
               artwork={artwork}
-              minimalUi={minimalUi}
-              routeMode={routeMode}
-              planState={planState}
-              bareBonesUi={bareBonesUi}
+              order={stageProps?.order}
+              paymentDraft={stageProps?.paymentDraft}
+              cartDraft={stageProps?.cartDraft}
+              currentProfile={stageProps?.currentProfile}
             />
-          ) : null}
+          ) : (
+            <>
+              {messages.map((message, index) => (
+                <MessageBubble
+                  key={`${message.role}-${index}`}
+                  role={message.role}
+                  text={message.text}
+                  minimalUi={minimalUi}
+                  bareBonesUi={bareBonesUi}
+                />
+              ))}
 
-          <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
+              <ProductInlineCard
+                product={product}
+                summary={summary}
+                artwork={artwork}
+                minimalUi={minimalUi}
+                routeMode={routeMode}
+                planState={planState}
+                bareBonesUi={bareBonesUi}
+              />
+
+              <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
+            </>
+          )}
         </Box>
       </Paper>
 

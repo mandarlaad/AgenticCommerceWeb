@@ -202,6 +202,7 @@ export default function StageActionCard({
   stage,
   options,
   product,
+  currentProfile,
   cartDraft,
   setCartDraft,
   paymentDraft,
@@ -258,7 +259,7 @@ export default function StageActionCard({
     }
   }, [stage, product]);
 
-  if (!stage || stage === 'idle' || stage === 'complete') return null;
+if (!stage || stage === 'idle' || stage === 'complete') return null;
 
   return (
     <Paper
@@ -329,6 +330,37 @@ export default function StageActionCard({
               title="Marketing preferences"
               body="You can also allow marketing communications so relevant offers and future updates can be shared with you later."
             />
+
+            {currentProfile ? (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 1.25,
+                  borderRadius: '14px',
+                  border: '1px solid rgba(24,22,26,0.08)',
+                  background: 'rgba(255,255,255,0.92)'
+                }}
+              >
+                <Typography sx={{ fontWeight: 700, fontSize: 14.5, mb: 0.75 }}>
+                  Profile details to be shared with your permission
+                </Typography>
+
+                <Stack spacing={0.5}>
+                  <Typography sx={{ color: '#5b6670', fontSize: 13.5 }}>
+                    <strong>Name:</strong> {currentProfile.firstName} {currentProfile.lastName}
+                  </Typography>
+                  <Typography sx={{ color: '#5b6670', fontSize: 13.5 }}>
+                    <strong>Email:</strong> {currentProfile.email}
+                  </Typography>
+                  <Typography sx={{ color: '#5b6670', fontSize: 13.5 }}>
+                    <strong>Phone:</strong> {currentProfile.phone}
+                  </Typography>
+                  <Typography sx={{ color: '#5b6670', fontSize: 13.5 }}>
+                    <strong>Address:</strong> {currentProfile.shippingAddress.line1}, {currentProfile.shippingAddress.city}, {currentProfile.shippingAddress.region} {currentProfile.shippingAddress.postalCode}
+                  </Typography>
+                </Stack>
+              </Paper>
+            ) : null}
           </Box>
 
           <Box
@@ -570,6 +602,57 @@ export default function StageActionCard({
               Continue
             </Button>
           </Box>
+        </Box>
+      ) : null}
+
+      {stage === 'approved' && product ? (
+        <Box sx={{ display: 'grid', gap: 1.5 }}>
+          <Typography sx={{ fontSize: 20, fontWeight: 800 }}>
+            🎉 You're approved
+          </Typography>
+
+          <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
+            Your financing offer is ready. Review your order and complete your purchase.
+          </Typography>
+
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: '18px',
+              border: '1px solid rgba(24,22,26,0.10)',
+              background: '#ffffff'
+            }}
+          >
+            <Stack spacing={1}>
+              <Typography sx={{ fontWeight: 700 }}>
+                {product.name}
+              </Typography>
+
+              <Typography sx={{ fontSize: 22, fontWeight: 800 }}>
+                ${product.price}
+              </Typography>
+
+              <Typography sx={{ color: '#43505e' }}>
+                {paymentDraft.railPreference === 'card'
+                  ? `${paymentDraft.termMonths || 24} monthly payments starting around $${paymentDraft.monthlyAmount || '--'}`
+                  : `4 payments of $${paymentDraft.monthlyAmount || '--'} with Bread Pay`}
+              </Typography>
+            </Stack>
+          </Paper>
+
+          <Button
+            onClick={onConfirmCheckout}
+            variant="contained"
+            sx={{
+              borderRadius: '999px',
+              textTransform: 'none',
+              fontWeight: 700,
+              boxShadow: 'none'
+            }}
+          >
+            Complete purchase
+          </Button>
         </Box>
       ) : null}
 
