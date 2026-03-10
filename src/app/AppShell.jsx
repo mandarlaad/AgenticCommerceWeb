@@ -73,7 +73,7 @@ function shopperFacingRouteStatus(order, shippingStatus) {
 export default function AppShell() {
   const [minimalUi, setMinimalUi] = useState(defaultMinimalUi);
   const [bareBonesUi, setBareBonesUi] = useState(defaultBareBonesUi);
-  const [runtimeArn, setRuntimeArn] = useState(() => localStorage.getItem('agentcore-runtime-arn') || defaultRuntimeArn);
+  const [runtimeArn, setRuntimeArn] = useState(() => defaultRuntimeArn || localStorage.getItem('agentcore-runtime-arn') || '');
   const [runtimeRegion] = useState(defaultRuntimeRegion);
   const [runtimeQualifier] = useState(defaultRuntimeQualifier);
   const [prompt, setPrompt] = useState('suggest treadmills under 1200; offer financing');

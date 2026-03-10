@@ -4,7 +4,7 @@ const os = require('os');
 const { spawn } = require('child_process');
 const webpack = require('webpack');
 
-const proxyTarget = process.env.API_PROXY_TARGET || 'https://6eqd0ms9ol.execute-api.us-east-2.amazonaws.com';
+const proxyTarget = process.env.API_PROXY_TARGET || 'https://qcb5ft7lt6.execute-api.us-east-2.amazonaws.com';
 
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
