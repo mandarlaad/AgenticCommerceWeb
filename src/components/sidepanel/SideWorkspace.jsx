@@ -1,8 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import RouteSummaryCard from './RouteSummaryCard';
 import FlowStatePanel from './FlowStatePanel';
 import ContractSurfacePanel from './ContractSurfacePanel';
 import ProtocolTracePanel from './ProtocolTracePanel';
+import { palette } from '../../lib/theme';
 
 export default function SideWorkspace({
   bareBonesUi = false,
@@ -29,16 +30,19 @@ export default function SideWorkspace({
   return (
     <div
       style={{
-        background: '#ffffff',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-        borderRadius: bareBonesUi ? 6 : 24,
+        background: bareBonesUi
+          ? '#ffffff'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.78) 0%, rgba(248,244,237,0.94) 100%)',
+        border: bareBonesUi ? '1px solid #d0d0d0' : `1px solid ${palette.line}`,
+        borderRadius: bareBonesUi ? 6 : 28,
         padding: 12,
         display: 'grid',
-        gap: 10,
+        gap: 12,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
-        gridTemplateRows: 'auto auto 1fr'
+        gridTemplateRows: 'auto auto 1fr',
+        boxShadow: bareBonesUi ? 'none' : '0 24px 48px rgba(18,32,43,0.08)'
       }}
     >
       <RouteSummaryCard routeMode={routeMode} orderStatus={orderStatus} plannerStatus={plannerStatus} bareBonesUi={bareBonesUi} />
@@ -51,14 +55,20 @@ export default function SideWorkspace({
                 key={tab.key}
                 onClick={() => setActivePanel(tab.key)}
                 style={{
-                  padding: '8px 12px',
-                  borderRadius: bareBonesUi ? 4 : 10,
-                  border: bareBonesUi ? '1px solid #bdbdbd' : '1px solid rgba(24,22,26,0.12)',
-                  background: activePanel === tab.key ? (bareBonesUi ? '#efefef' : '#3e6d6b') : 'rgba(255,255,255,0.78)',
-                  color: activePanel === tab.key ? (bareBonesUi ? '#111111' : '#f5efe4') : '#243039',
+                  padding: '9px 13px',
+                  borderRadius: bareBonesUi ? 4 : 12,
+                  border: bareBonesUi ? '1px solid #bdbdbd' : `1px solid ${palette.line}`,
+                  background:
+                    activePanel === tab.key
+                      ? bareBonesUi
+                        ? '#efefef'
+                        : `linear-gradient(135deg, ${palette.teal} 0%, ${palette.tealDeep} 100%)`
+                      : 'rgba(255,255,255,0.84)',
+                  color: activePanel === tab.key ? (bareBonesUi ? '#111111' : '#f7f4ed') : palette.ink,
                   cursor: 'pointer',
                   fontSize: 13,
-                  fontWeight: 600
+                  fontWeight: 700,
+                  boxShadow: activePanel === tab.key && !bareBonesUi ? '0 12px 24px rgba(37,108,115,0.16)' : 'none'
                 }}
               >
                 {tab.label}
@@ -66,7 +76,7 @@ export default function SideWorkspace({
             ))}
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontFamily: '"Trebuchet MS", sans-serif', fontSize: 12.5, color: '#43505e' }}>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', fontFamily: '"Avenir Next", Avenir, Helvetica, Arial, sans-serif', fontSize: 12.5, color: palette.slate }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <input type="checkbox" checked={showContractSurface} onChange={(e) => setShowContractSurface(e.target.checked)} />
             Contract surface
@@ -82,15 +92,15 @@ export default function SideWorkspace({
         style={{
           overflow: 'hidden',
           minHeight: 0,
-          paddingRight: 0,
-          background: '#ffffff',
-          border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.1)',
-          borderRadius: bareBonesUi ? 4 : 18,
+          background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.94)',
+          border: bareBonesUi ? '1px solid #d0d0d0' : `1px solid ${palette.line}`,
+          borderRadius: bareBonesUi ? 4 : 20,
           padding: 10,
-          height: '100%'
+          height: '100%',
+          boxShadow: bareBonesUi ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.92)'
         }}
       >
-        <div style={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, height: '100%', paddingRight: 4 }}>
+        <div style={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, height: '100%', paddingRight: 6, scrollbarGutter: 'stable' }}>
           {activePanel === 'state' ? <FlowStatePanel {...flowProps} bareBonesUi={bareBonesUi} /> : null}
           {activePanel === 'contracts' && showContractSurface ? <ContractSurfacePanel contracts={contracts} /> : null}
           {activePanel === 'trace' && showProtocolTrace ? <ProtocolTracePanel trace={trace} base={base} /> : null}
@@ -99,3 +109,4 @@ export default function SideWorkspace({
     </div>
   );
 }
+

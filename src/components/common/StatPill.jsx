@@ -4,13 +4,13 @@ import { palette } from '../../lib/theme';
 function statusTone(status) {
   if (!status) return { bg: '#efe4cf', fg: palette.ink };
   if (/CONFIRMED|CAPTURED|DELIVERED|GRANTED|VERIFIED|CLEAR/i.test(status)) {
-    return { bg: 'rgba(77,107,87,0.18)', fg: palette.moss };
+    return { bg: 'rgba(82,113,101,0.16)', fg: palette.moss };
   }
   if (/READY|AUTHORIZED|CREATED|PENDING|OPEN|MATCHED|BNPL|REVIEW|SHOWING/i.test(status)) {
-    return { bg: 'rgba(30,109,116,0.16)', fg: palette.teal };
+    return { bg: 'rgba(37,108,115,0.14)', fg: palette.teal };
   }
   if (/DECLINED|FAILED|ERROR/i.test(status)) {
-    return { bg: 'rgba(205,91,46,0.18)', fg: palette.ember };
+    return { bg: 'rgba(201,102,61,0.14)', fg: palette.ember };
   }
   return { bg: '#efe4cf', fg: palette.ink };
 }
@@ -23,15 +23,17 @@ export default function StatPill({ label, compact = false }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 8,
-        padding: compact ? '5px 10px' : '7px 12px',
+        padding: compact ? '5px 10px' : '7px 13px',
         borderRadius: 999,
         background: tone.bg,
         color: tone.fg,
-        fontFamily: '"Trebuchet MS", sans-serif',
-        fontSize: compact ? 11 : 12,
-        letterSpacing: '0.08em',
+        fontFamily: '"Avenir Next", Avenir, Helvetica, Arial, sans-serif',
+        fontSize: compact ? 10.5 : 11.5,
+        fontWeight: 600,
+        letterSpacing: '0.09em',
         textTransform: 'uppercase',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
+        border: `1px solid ${tone.bg}`
       }}
     >
       <span
@@ -47,3 +49,4 @@ export default function StatPill({ label, compact = false }) {
     </span>
   );
 }
+

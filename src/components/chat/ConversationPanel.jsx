@@ -1,8 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import ControlBar from '../ControlBar';
 import MessageBubble from './MessageBubble';
 import ProductInlineCard from './ProductInlineCard';
 import StageActionCard from './StageActionCard';
+import { palette } from '../../lib/theme';
 
 export default function ConversationPanel({
   minimalUi,
@@ -25,31 +26,47 @@ export default function ConversationPanel({
   return (
     <div
       style={{
-        background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.58)',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-        borderRadius: bareBonesUi ? 6 : 24,
+        background: bareBonesUi
+          ? '#ffffff'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(248,244,237,0.96) 100%)',
+        border: bareBonesUi ? '1px solid #d0d0d0' : `1px solid ${palette.line}`,
+        borderRadius: bareBonesUi ? 6 : 28,
         padding: minimalUi ? 14 : 18,
         display: 'grid',
-        gap: 12,
+        gap: 14,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
+        boxShadow: bareBonesUi ? 'none' : '0 24px 48px rgba(18,32,43,0.08)'
       }}
     >
       <div
         style={{
-          background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.55)',
-          border: bareBonesUi ? '1px solid #d8d8d8' : '1px solid rgba(24,22,26,0.12)',
-          borderRadius: bareBonesUi ? 4 : 20,
-          padding: 12,
+          background: bareBonesUi
+            ? '#ffffff'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(249,252,252,0.95) 100%)',
+          border: bareBonesUi ? '1px solid #d8d8d8' : `1px solid ${palette.line}`,
+          borderRadius: bareBonesUi ? 4 : 24,
+          padding: 16,
           display: 'grid',
-          gap: 10,
+          gap: 12,
           minHeight: 0,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxShadow: bareBonesUi ? 'none' : 'inset 0 1px 0 rgba(255,255,255,0.92)'
         }}
       >
-        <div style={{ display: 'grid', gap: 12, alignContent: 'start', overflow: 'auto', paddingRight: 6, minHeight: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gap: 12,
+            alignContent: 'start',
+            overflow: 'auto',
+            paddingRight: 8,
+            minHeight: 0,
+            scrollbarGutter: 'stable'
+          }}
+        >
           {messages.map((message, index) => (
             <MessageBubble key={`${message.role}-${index}`} role={message.role} text={message.text} minimalUi={minimalUi} bareBonesUi={bareBonesUi} />
           ))}
@@ -73,3 +90,4 @@ export default function ConversationPanel({
     </div>
   );
 }
+

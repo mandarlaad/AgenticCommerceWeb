@@ -1,10 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import StatPill from '../common/StatPill';
+import { palette } from '../../lib/theme';
 
 function Field({ label, children }) {
   return (
     <label style={{ display: 'grid', gap: 6 }}>
-      <span style={{ fontFamily: '"Trebuchet MS", sans-serif', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#43505e' }}>
+      <span style={{ fontFamily: '"Avenir Next", Avenir, Helvetica, Arial, sans-serif', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.14em', color: palette.slate }}>
         {label}
       </span>
       {children}
@@ -17,17 +18,37 @@ function Input(props) {
     <input
       {...props}
       style={{
-        padding: '10px 12px',
-        borderRadius: 12,
-        border: '1px solid rgba(24,22,26,0.12)',
-        background: 'rgba(255,255,255,0.9)',
+        padding: '11px 13px',
+        borderRadius: 14,
+        border: `1px solid ${palette.line}`,
+        background: 'rgba(248,250,250,0.94)',
         fontSize: 14,
         boxSizing: 'border-box',
         width: '100%',
+        color: palette.ink,
+        fontFamily: '"Avenir Next", Avenir, Helvetica, Arial, sans-serif',
         ...(props.style || {})
       }}
     />
   );
+}
+
+function actionButtonStyle(bareBonesUi, tone) {
+  const tones = {
+    teal: `linear-gradient(135deg, ${palette.teal} 0%, ${palette.tealDeep} 100%)`,
+    slate: 'linear-gradient(135deg, #54777d 0%, #36555d 100%)'
+  };
+  return {
+    justifySelf: 'start',
+    padding: '10px 14px',
+    borderRadius: bareBonesUi ? 4 : 999,
+    border: bareBonesUi ? '1px solid #bdbdbd' : 'none',
+    background: bareBonesUi ? '#f2f2f2' : tones[tone] || tones.slate,
+    color: bareBonesUi ? '#111111' : '#f5efe4',
+    cursor: 'pointer',
+    fontWeight: 600,
+    boxShadow: bareBonesUi ? 'none' : '0 12px 24px rgba(37,108,115,0.18)'
+  };
 }
 
 export default function StageActionCard({
@@ -55,15 +76,19 @@ export default function StageActionCard({
         justifySelf: 'start',
         width: '100%',
         maxWidth: '92%',
-        background: '#ffffff',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.12)',
-        borderRadius: bareBonesUi ? 4 : 20,
-        padding: 14,
+        background: bareBonesUi
+          ? '#ffffff'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(242,249,249,0.94) 100%)',
+        border: bareBonesUi ? '1px solid #d0d0d0' : `1px solid ${palette.line}`,
+        borderRadius: bareBonesUi ? 4 : 22,
+        padding: 16,
         display: 'grid',
-        gap: 12
+        gap: 14,
+        boxShadow: bareBonesUi ? 'none' : '0 14px 28px rgba(18,32,43,0.06)'
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: palette.ink }}>Guided checkout step</div>
         <StatPill label={stage.replace('_', ' ')} />
       </div>
 
@@ -76,15 +101,16 @@ export default function StageActionCard({
               disabled={loading}
               style={{
                 textAlign: 'left',
-                padding: '12px 14px',
-                borderRadius: bareBonesUi ? 4 : 16,
-                border: bareBonesUi ? '1px solid #cccccc' : '1px solid rgba(24,22,26,0.12)',
-                background: '#ffffff',
-                cursor: 'pointer'
+                padding: '13px 14px',
+                borderRadius: bareBonesUi ? 4 : 18,
+                border: bareBonesUi ? '1px solid #cccccc' : `1px solid ${palette.line}`,
+                background: 'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(247,250,250,0.94) 100%)',
+                cursor: 'pointer',
+                boxShadow: bareBonesUi ? 'none' : '0 10px 20px rgba(18,32,43,0.04)'
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 600 }}>{option.name}</div>
-              <div style={{ color: '#43505e' }}>SKU {option.sku} · ${option.price}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: palette.ink }}>{option.name}</div>
+              <div style={{ color: palette.slate }}>SKU {option.sku} � ${option.price}</div>
             </button>
           ))}
         </div>
@@ -92,11 +118,8 @@ export default function StageActionCard({
 
       {stage === 'consent' ? (
         <div style={{ display: 'grid', gap: 10 }}>
-          <button
-            onClick={onGrantConsent}
-            disabled={loading}
-            style={{ justifySelf: 'start', padding: '10px 14px', borderRadius: bareBonesUi ? 4 : 999, border: bareBonesUi ? '1px solid #bdbdbd' : 'none', background: bareBonesUi ? '#f2f2f2' : '#2c7b7f', color: bareBonesUi ? '#111111' : '#f5efe4', cursor: 'pointer' }}
-          >
+          <div style={{ color: palette.slate, lineHeight: 1.45 }}>Approve the data-sharing scopes required to continue into merchant checkout and financing.</div>
+          <button onClick={onGrantConsent} disabled={loading} style={actionButtonStyle(bareBonesUi, 'teal')}>
             Grant consent
           </button>
         </div>
@@ -160,11 +183,7 @@ export default function StageActionCard({
               />
             </Field>
           </div>
-          <button
-            onClick={onContinueToScreening}
-            disabled={loading}
-            style={{ justifySelf: 'start', padding: '10px 14px', borderRadius: bareBonesUi ? 4 : 999, border: bareBonesUi ? '1px solid #bdbdbd' : 'none', background: bareBonesUi ? '#f2f2f2' : '#355c67', color: bareBonesUi ? '#111111' : '#f5efe4', cursor: 'pointer' }}
-          >
+          <button onClick={onContinueToScreening} disabled={loading} style={actionButtonStyle(bareBonesUi, 'slate')}>
             Continue to identity and fraud checks
           </button>
         </div>
@@ -176,14 +195,10 @@ export default function StageActionCard({
             <StatPill label={screening?.identityStatus || 'Pending'} compact />
             <StatPill label={screening?.fraudStatus || 'Pending'} compact />
           </div>
-          <div style={{ color: '#43505e', lineHeight: 1.45 }}>
+          <div style={{ color: palette.slate, lineHeight: 1.45 }}>
             {screening?.recommendation || 'Identity and fraud signals will appear here.'}
           </div>
-          <button
-            onClick={onContinueToPayment}
-            disabled={loading}
-            style={{ justifySelf: 'start', padding: '10px 14px', borderRadius: bareBonesUi ? 4 : 999, border: bareBonesUi ? '1px solid #bdbdbd' : 'none', background: bareBonesUi ? '#f2f2f2' : '#355c67', color: bareBonesUi ? '#111111' : '#f5efe4', cursor: 'pointer' }}
-          >
+          <button onClick={onContinueToPayment} disabled={loading} style={actionButtonStyle(bareBonesUi, 'slate')}>
             Continue to payment preparation
           </button>
         </div>
@@ -196,7 +211,7 @@ export default function StageActionCard({
               <select
                 value={paymentDraft.railPreference}
                 onChange={(e) => setPaymentDraft((draft) => ({ ...draft, railPreference: e.target.value }))}
-                style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(24,22,26,0.12)', background: 'rgba(255,255,255,0.9)', fontSize: 14 }}
+                style={{ padding: '11px 13px', borderRadius: 14, border: `1px solid ${palette.line}`, background: 'rgba(248,250,250,0.94)', fontSize: 14, color: palette.ink, fontFamily: '"Avenir Next", Avenir, Helvetica, Arial, sans-serif' }}
               >
                 <option value="bnpl">BNPL</option>
                 <option value="card">Card</option>
@@ -212,11 +227,7 @@ export default function StageActionCard({
               onChange={(e) => setPaymentDraft((draft) => ({ ...draft, detailsLabel: e.target.value }))}
             />
           </Field>
-          <button
-            onClick={onPreparePayment}
-            disabled={loading}
-            style={{ justifySelf: 'start', padding: '10px 14px', borderRadius: bareBonesUi ? 4 : 999, border: bareBonesUi ? '1px solid #bdbdbd' : 'none', background: bareBonesUi ? '#f2f2f2' : '#2c7b7f', color: bareBonesUi ? '#111111' : '#f5efe4', cursor: 'pointer' }}
-          >
+          <button onClick={onPreparePayment} disabled={loading} style={actionButtonStyle(bareBonesUi, 'teal')}>
             Prepare payment and checkout session
           </button>
         </div>
@@ -224,14 +235,10 @@ export default function StageActionCard({
 
       {stage === 'confirm' ? (
         <div style={{ display: 'grid', gap: 10 }}>
-          <div style={{ color: '#43505e', lineHeight: 1.45 }}>
+          <div style={{ color: palette.slate, lineHeight: 1.45 }}>
             The product, shipping, screening, and tokenized payment are ready. Confirm to complete checkout.
           </div>
-          <button
-            onClick={onConfirmCheckout}
-            disabled={loading}
-            style={{ justifySelf: 'start', padding: '10px 14px', borderRadius: bareBonesUi ? 4 : 999, border: bareBonesUi ? '1px solid #bdbdbd' : 'none', background: bareBonesUi ? '#f2f2f2' : '#355c67', color: bareBonesUi ? '#111111' : '#f5efe4', cursor: 'pointer' }}
-          >
+          <button onClick={onConfirmCheckout} disabled={loading} style={actionButtonStyle(bareBonesUi, 'slate')}>
             Confirm order and complete checkout
           </button>
         </div>
@@ -239,3 +246,4 @@ export default function StageActionCard({
     </div>
   );
 }
+
