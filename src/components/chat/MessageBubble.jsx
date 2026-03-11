@@ -20,7 +20,7 @@ export default function MessageBubble({ role, text }) {
     const timer = setTimeout(() => {
       setShowThinking(false);
       setVisible(true);
-    }, 450);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [text, isUser]);

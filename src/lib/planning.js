@@ -43,7 +43,7 @@ export function extractQuery(userText) {
   const text = (userText || '').toLowerCase();
 
   if (/treadmill|fitness|workout/.test(text)) return 'treadmill';
-  if (/ring|jewelry|diamond/.test(text)) return 'ring';
+  if (/ring|jewelry|diamond|necklace|signet/.test(text)) return 'ring';
   if (/shoe|sneaker/.test(text)) return 'shoe';
   if (/jeans|denim/.test(text)) return 'jeans';
   if (/camera|canon/.test(text)) return 'camera';

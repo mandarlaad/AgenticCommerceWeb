@@ -13,6 +13,8 @@ import {
 } from '@mui/material';
 import StatPill from '../common/StatPill';
 import { productArtwork } from '../../lib/planning';
+import kaylogo from '../../images/kay-logo.jpg';
+
 
 
 function Field({ label, children }) {
@@ -81,7 +83,7 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
       >
         <Box
           component="img"
-          src={productArtwork(option)}
+          src={kaylogo}      
           alt={option.name}
           sx={{
             width: '100%',

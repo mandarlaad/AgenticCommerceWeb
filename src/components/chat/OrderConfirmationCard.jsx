@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
+import kaylogo from '../../images/kay-logo.jpg';
+
 
 function paymentLabel(railPreference) {
   return railPreference === 'card' ? 'Bread Credit Card' : 'Bread Pay';
@@ -61,7 +63,7 @@ export default function OrderConfirmationCard({
       >
         <Box
           component="img"
-          src={artwork}
+          src={kaylogo}
           alt={product.name}
           sx={{
             width: '100%',

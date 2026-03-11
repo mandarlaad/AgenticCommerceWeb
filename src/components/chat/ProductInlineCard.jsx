@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material';
 import StatPill from '../common/StatPill';
+import kaylogo from '../../images/kay-logo.jpg';
 
 function monthlyEstimate(price) {
   const amount = Number(price || 0);
@@ -12,7 +13,11 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
   if (!product) return null;
 
   const monthly = monthlyEstimate(product.price);
-
+const imageSrc =
+  product?.name?.toLowerCase().includes('ring') ||
+  product?.name?.toLowerCase().includes('earring')
+    ? kaylogo
+    : artwork;
   return (
     <Paper
       elevation={0}
@@ -36,19 +41,19 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
         }}
       >
         {!bareBonesUi ? (
-          <Box
-            component="img"
-            src={artwork}
-            alt={product.name}
-            sx={{
-              width: '100%',
-              height: minimalUi ? 104 : 128,
-              objectFit: 'cover',
-              borderRadius: '18px',
-              border: '1px solid rgba(24,22,26,0.08)',
-              background: '#f7f7f7'
-            }}
-          />
+        <Box
+          component="img"
+          src={kaylogo}
+          alt={product.name}
+          sx={{
+            width: '100%',
+            height: minimalUi ? 104 : 128,
+            objectFit: 'cover',
+            borderRadius: '18px',
+            border: '1px solid rgba(24,22,26,0.08)',
+            background: '#f7f7f7'
+          }}
+        />
         ) : null}
 
         <Box sx={{ display: 'grid', gap: 0.75 }}>

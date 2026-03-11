@@ -158,7 +158,7 @@ export default function ControlBar({
               fontSize: typeScale.bodySm
             }}
           >
-            Try: “show treadmills under $1200 with Bread Credit Card offers”
+            Try: “Find me a pair of diamond earrings under $1500 and finance it”
           </Typography>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', pr: 0.25 }}>

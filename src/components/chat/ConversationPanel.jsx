@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import ControlBar from '../ControlBar';
 import MessageBubble from './MessageBubble';
@@ -25,6 +25,23 @@ export default function ConversationPanel({
   stageProps
 }) {
   const isComplete = stageProps?.stage === 'complete';
+  const [showDeferredContent, setShowDeferredContent] = useState(true);
+
+useEffect(() => {
+  const lastMessage = messages?.[messages.length - 1];
+
+  if (lastMessage?.role === 'assistant') {
+    setShowDeferredContent(false);
+
+    const timer = setTimeout(() => {
+      setShowDeferredContent(true);
+    }, 1300);
+
+    return () => clearTimeout(timer);
+  }
+
+  setShowDeferredContent(true);
+}, [messages]);
 
   return (
     <Paper
@@ -141,17 +158,21 @@ export default function ConversationPanel({
                 />
               ))}
 
-              <ProductInlineCard
-                product={product}
-                summary={summary}
-                artwork={artwork}
-                minimalUi={minimalUi}
-                routeMode={routeMode}
-                planState={planState}
-                bareBonesUi={bareBonesUi}
-              />
+              {showDeferredContent ? (
+                <>
+                  <ProductInlineCard
+                    product={product}
+                    summary={summary}
+                    artwork={artwork}
+                    minimalUi={minimalUi}
+                    routeMode={routeMode}
+                    planState={planState}
+                    bareBonesUi={bareBonesUi}
+                  />
 
-              <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
+                  <StageActionCard {...stageProps} bareBonesUi={bareBonesUi} />
+                </>
+              ) : null}
             </>
           )}
         </Box>
