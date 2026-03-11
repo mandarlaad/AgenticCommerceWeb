@@ -14,7 +14,7 @@ import {
   screeningFromDraft
 } from '../lib/planning';
 import { panelStyle, palette, shellStyle } from '../lib/theme';
-import mockProfiles from '../lib/mockProfiles';
+import mockProfiles from '../lib/mockprofiles';
 import logo from '../images/logo.png';
 
 const API_BASE = '/api';
@@ -91,7 +91,20 @@ export default function AppShell() {
   const [flowStage, setFlowStage] = useState('idle');
   const [product, setProduct] = useState(null);
   const [consentRecord, setConsentRecord] = useState(null);
-  const [currentProfile] = useState(() => mockProfiles[Math.floor(Math.random() * mockProfiles.length)]);
+  const [currentProfile] = useState(() => {
+      const params = new URLSearchParams(window.location.search);
+      const requested = (params.get('profile') || 'new').toLowerCase();
+
+      if (requested === 'existing') {
+        return mockProfiles.find((p) => p.customerType === 'existing') || mockProfiles[0];
+      }
+
+      if (requested === 'risk') {
+        return mockProfiles.find((p) => p.customerType === 'risk') || mockProfiles[0];
+      }
+
+      return mockProfiles.find((p) => p.customerType === 'new') || mockProfiles[0];
+    });
   const [cartDraft, setCartDraft] = useState({
     qty: 1,
     shippingAddress: {
@@ -545,18 +558,14 @@ export default function AppShell() {
             </div>
 
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
-              <Chip
-                label={
-                  currentProfile.customerType === 'existing'
-                    ? 'Existing customer'
-                    : currentProfile.customerType === 'risk'
-                      ? 'Risk profile'
-                      : 'New customer'
-                }
-                color={currentProfile.customerType === 'existing' ? 'secondary' : currentProfile.customerType === 'risk' ? 'warning' : 'primary'}
-                variant="outlined"
-              />
-              <IconButton onClick={() => setProfileOpen(true)}>
+              <IconButton
+                onClick={() => setProfileOpen(true)}
+                sx={{
+                  border: '1px solid rgba(24,22,26,0.08)',
+                  background: 'rgba(255,255,255,0.72)',
+                  boxShadow: '0 8px 24px rgba(24,22,26,0.06)'
+                }}
+              >
                 <AccountCircleRoundedIcon sx={{ fontSize: 34 }} />
               </IconButton>
             </Stack>
@@ -655,18 +664,14 @@ export default function AppShell() {
                 {currentProfile.firstName[0]}
                 {currentProfile.lastName[0]}
               </Avatar>
-              <Box>
-                <Typography sx={{ fontWeight: 800 }}>
-                  {currentProfile.firstName} {currentProfile.lastName}
-                </Typography>
-                <Typography sx={{ color: 'text.secondary' }}>
-                  {currentProfile.customerType === 'existing'
-                    ? 'Existing customer profile'
-                    : currentProfile.customerType === 'risk'
-                      ? 'High-risk profile'
-                      : 'New customer profile'}
-                </Typography>
-              </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 800 }}>
+                    {currentProfile.firstName} {currentProfile.lastName}
+                  </Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>
+                    Signed-in customer
+                  </Typography>
+                </Box>
             </Stack>
 
             <Divider />

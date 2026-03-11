@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import StateCard from './StateCard';
 import { describePlan, friendlyDeclineReason } from '../../lib/planning';
+import { palette, typeScale } from '../../lib/theme';
 
 export default function FlowStatePanel({
   planState,
@@ -98,8 +99,16 @@ export default function FlowStatePanel({
   ];
 
   return (
-    <Box sx={{ display: 'grid', gap: 1 }}>
-      <Typography sx={{ color: 'text.secondary', fontSize: 13, lineHeight: 1.5, mb: 0.5 }}>
+    <Box sx={{ display: 'grid', gap: 1.1 }}>
+      <Typography
+        sx={{
+          color: palette.muted,
+          fontSize: typeScale.bodySm,
+          lineHeight: 1.65,
+          mb: 0.5,
+          fontWeight: 500
+        }}
+      >
         This view tracks the shopper journey from intent parsing through checkout, payment, and fulfillment state.
       </Typography>
 

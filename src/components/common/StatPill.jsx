@@ -3,17 +3,17 @@ import { Box, Typography } from '@mui/material';
 import { palette } from '../../lib/theme';
 
 function statusTone(status) {
-  if (!status) return { bg: '#efe4cf', fg: palette.ink };
+  if (!status) return { bg: '#EAF0F6', fg: palette.ink };
   if (/CONFIRMED|CAPTURED|DELIVERED|GRANTED|VERIFIED|CLEAR/i.test(status)) {
-    return { bg: 'rgba(77,107,87,0.18)', fg: palette.moss };
+    return { bg: 'rgba(77,107,87,0.16)', fg: palette.moss };
   }
   if (/READY|AUTHORIZED|CREATED|PENDING|OPEN|MATCHED|BNPL|REVIEW|SHOWING/i.test(status)) {
-    return { bg: 'rgba(30,109,116,0.16)', fg: palette.teal };
+    return { bg: 'rgba(28,129,149,0.14)', fg: palette.breadCard };
   }
   if (/DECLINED|FAILED|ERROR/i.test(status)) {
-    return { bg: 'rgba(205,91,46,0.18)', fg: palette.ember };
+    return { bg: 'rgba(240,138,75,0.16)', fg: palette.accent };
   }
-  return { bg: '#efe4cf', fg: palette.ink };
+  return { bg: '#EAF0F6', fg: palette.ink };
 }
 
 export default function StatPill({ label, compact = false }) {
@@ -25,13 +25,13 @@ export default function StatPill({ label, compact = false }) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 0.75,
-        px: compact ? 1.15 : 1.4,
-        py: compact ? 0.6 : 0.8,
+        px: compact ? 1.25 : 1.55,
+        py: compact ? 0.72 : 0.92,
         borderRadius: '999px',
         background: tone.bg,
         color: tone.fg,
         whiteSpace: 'nowrap',
-        border: '1px solid rgba(24,22,26,0.04)'
+        border: '1px solid rgba(15,23,42,0.04)'
       }}
     >
       <Box
@@ -46,10 +46,10 @@ export default function StatPill({ label, compact = false }) {
 
       <Typography
         sx={{
-          fontSize: compact ? 11 : 12,
+          fontSize: compact ? '0.76rem' : '0.82rem',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
-          fontWeight: 700,
+          fontWeight: 800,
           lineHeight: 1
         }}
       >

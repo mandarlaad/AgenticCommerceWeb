@@ -4,6 +4,7 @@ import RouteSummaryCard from './RouteSummaryCard';
 import FlowStatePanel from './FlowStatePanel';
 import ContractSurfacePanel from './ContractSurfacePanel';
 import ProtocolTracePanel from './ProtocolTracePanel';
+import { glassPanelStyle, palette, typeScale } from '../../lib/theme';
 
 export default function SideWorkspace({
   bareBonesUi = false,
@@ -11,9 +12,7 @@ export default function SideWorkspace({
   orderStatus,
   plannerStatus,
   showContractSurface,
-  setShowContractSurface,
   showProtocolTrace,
-  setShowProtocolTrace,
   activePanel,
   setActivePanel,
   flowProps,
@@ -36,40 +35,62 @@ export default function SideWorkspace({
     <Paper
       elevation={0}
       sx={{
-        background: '#ffffff',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.10)',
-        borderRadius: bareBonesUi ? '6px' : '24px',
-        p: 1.5,
+        ...glassPanelStyle,
+        background:
+          'linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(244,248,253,0.82) 100%)',
+        borderRadius: bareBonesUi ? '8px' : '30px',
+        p: 1.75,
         display: 'grid',
-        gap: 1.25,
+        gap: 1.35,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
         gridTemplateRows: 'auto auto 1fr',
-        boxShadow: bareBonesUi ? 'none' : '0 16px 40px rgba(24,22,26,0.06)'
+        position: 'relative'
       }}
     >
-      <RouteSummaryCard
-        routeMode={routeMode}
-        orderStatus={orderStatus}
-        plannerStatus={plannerStatus}
-        bareBonesUi={bareBonesUi}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background:
+            'radial-gradient(circle at 80% 10%, rgba(28,129,149,0.06), transparent 18%), radial-gradient(circle at 14% 86%, rgba(19,41,75,0.05), transparent 22%)'
+        }}
       />
 
-      <Box sx={{ display: 'grid', gap: 1 }}>
+      <Box sx={{ position: 'relative' }}>
+        <RouteSummaryCard
+          routeMode={routeMode}
+          orderStatus={orderStatus}
+          plannerStatus={plannerStatus}
+          bareBonesUi={bareBonesUi}
+        />
+      </Box>
+
+      <Box sx={{ display: 'grid', gap: 1.1, position: 'relative' }}>
         <Box>
           <Typography
             variant="overline"
             sx={{
-              color: 'text.secondary',
+              color: palette.breadCard,
+              fontWeight: 800,
               letterSpacing: '0.14em',
-              fontWeight: 700
+              fontSize: typeScale.label
             }}
           >
             Behind the scenes
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Review the journey, contract surfaces, and request trace for the current flow.
+          <Typography
+            sx={{
+              color: palette.muted,
+              mt: 0.35,
+              fontSize: typeScale.body,
+              lineHeight: 1.65,
+              fontWeight: 500
+            }}
+          >
+            Review the journey, contract surfaces, and request trace for this flow.
           </Typography>
         </Box>
 
@@ -82,11 +103,22 @@ export default function SideWorkspace({
           variant="scrollable"
           scrollButtons="auto"
           sx={{
-            minHeight: 40,
+            minHeight: 44,
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: 999,
+              background: 'linear-gradient(90deg, #13294B 0%, #1C8195 100%)'
+            },
             '& .MuiTab-root': {
-              minHeight: 40,
+              minHeight: 44,
               textTransform: 'none',
-              fontWeight: 700
+              fontWeight: 800,
+              fontSize: typeScale.bodySm,
+              color: palette.primarySoft,
+              px: 1.5
+            },
+            '& .Mui-selected': {
+              color: palette.ink
             }
           }}
         >
@@ -99,16 +131,27 @@ export default function SideWorkspace({
       <Paper
         elevation={0}
         sx={{
+          position: 'relative',
           overflow: 'hidden',
           minHeight: 0,
-          background: '#ffffff',
-          border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.08)',
-          borderRadius: bareBonesUi ? '4px' : '18px',
-          p: 1.25,
-          height: '100%'
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(247,250,253,0.90) 100%)',
+          border: `1px solid ${palette.softLine}`,
+          borderRadius: bareBonesUi ? '6px' : '22px',
+          p: 1.35,
+          height: '100%',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.72)'
         }}
       >
-        <Box sx={{ overflowY: 'auto', overflowX: 'hidden', minHeight: 0, height: '100%', pr: 0.5 }}>
+        <Box
+          sx={{
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            minHeight: 0,
+            height: '100%',
+            pr: 0.5
+          }}
+        >
           {activePanel === 'state' ? <FlowStatePanel {...flowProps} bareBonesUi={bareBonesUi} /> : null}
           {activePanel === 'contracts' && showContractSurface ? <ContractSurfacePanel contracts={contracts} /> : null}
           {activePanel === 'trace' && showProtocolTrace ? <ProtocolTracePanel trace={trace} base={base} /> : null}

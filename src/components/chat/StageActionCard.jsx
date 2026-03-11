@@ -14,6 +14,7 @@ import {
 import StatPill from '../common/StatPill';
 import { productArtwork } from '../../lib/planning';
 
+
 function Field({ label, children }) {
   return (
     <Box sx={{ display: 'grid', gap: 0.75 }}>
@@ -109,10 +110,22 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
           </Box>
 
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            {monthly ? <Chip size="small" color="secondary" label={`Bread Credit Card from $${monthly}/mo`} /> : null}
-            <Chip size="small" color="primary" label="Bread Pay available" />
-            <Chip size="small" variant="outlined" label="Prequalify" />
-          </Stack>
+              {monthly ? (
+                <Chip
+                  size="small"
+                  label={`Bread Credit Card from $${monthly}/mo`}
+                  sx={{ background: '#1C8195', color: '#fff' }}
+                />
+              ) : null}
+
+              <Chip
+                size="small"
+                label="Bread Pay available"
+                sx={{ background: '#13294B', color: '#fff' }}
+              />
+
+              <Chip size="small" variant="outlined" label="Prequalify" />
+            </Stack>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
@@ -123,7 +136,13 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
                 borderRadius: '999px',
                 textTransform: 'none',
                 fontWeight: 700,
-                boxShadow: 'none'
+                boxShadow: 'none',
+                background: "#334155",
+                '&:hover': {
+                  background: "#1E293B"
+                },
+                color: "#FFFFFF"
+
               }}
             >
               Continue with this item
@@ -155,27 +174,42 @@ function ConsentBullet({ title, body }) {
   );
 }
 
-function OfferCard({ title, subtext, chipText, onClick, primary = false }) {
+function OfferCard({ title, subtext, chipText, onClick, primary = false, offerType = 'card' }) {
+  const isCard = offerType === 'card';
+
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 1.5,
-        borderRadius: '18px',
-        border: primary ? '1px solid rgba(30,109,116,0.26)' : '1px solid rgba(24,22,26,0.10)',
-        background: primary ? 'linear-gradient(135deg, rgba(30,109,116,0.08) 0%, rgba(255,255,255,1) 100%)' : '#ffffff',
+        p: 1.75,
+        borderRadius: '20px',
+        border: isCard
+          ? '1px solid rgba(28,129,149,0.24)'
+          : '1px solid rgba(19,41,75,0.18)',
+        background: isCard
+          ? 'linear-gradient(135deg, rgba(28,129,149,0.10) 0%, rgba(255,255,255,1) 100%)'
+          : 'linear-gradient(135deg, rgba(19,41,75,0.08) 0%, rgba(255,255,255,1) 100%)',
         display: 'grid',
-        gap: 1
+        gap: 1.1,
+        boxShadow: '0 10px 24px rgba(15,23,42,0.05)'
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Typography sx={{ fontSize: 16, fontWeight: 800 }}>
+        <Typography sx={{ fontSize: 17, fontWeight: 800 }}>
           {title}
         </Typography>
-        <Chip size="small" color={primary ? 'secondary' : 'primary'} label={chipText} />
+        <Chip
+          size="small"
+          label={chipText}
+          sx={{
+            fontWeight: 800,
+            color: '#fff',
+            background: isCard ? '#1C8195' : '#13294B'
+          }}
+        />
       </Box>
 
-      <Typography sx={{ color: '#43505e', lineHeight: 1.5 }}>
+      <Typography sx={{ color: '#43505e', lineHeight: 1.6, fontSize: 15 }}>
         {subtext}
       </Typography>
 
@@ -184,10 +218,15 @@ function OfferCard({ title, subtext, chipText, onClick, primary = false }) {
           onClick={onClick}
           variant="contained"
           sx={{
-            borderRadius: '999px',
-            textTransform: 'none',
-            fontWeight: 700,
-            boxShadow: 'none'
+            background: isCard
+              ? 'linear-gradient(135deg, #1C8195 0%, #176D7E 100%)'
+              : 'linear-gradient(135deg, #13294B 0%, #0E1E39 100%)',
+            boxShadow: '0 10px 20px rgba(15,23,42,0.16)',
+            '&:hover': {
+              background: isCard
+                ? 'linear-gradient(135deg, #176D7E 0%, #145E6D 100%)'
+                : 'linear-gradient(135deg, #10233F 0%, #0B1730 100%)'
+            }
           }}
         >
           Choose this offer
@@ -430,6 +469,7 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
             chipText={`from $${offerSet.card.monthlyAmount}/mo`}
             subtext={`${offerSet.card.termMonths} monthly payments at ${offerSet.card.apr}% APR for this purchase.`}
             primary
+            offerType="card"
             onClick={() => onSelectFinancingOffer(offerSet.card)}
           />
 
@@ -437,6 +477,7 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
             title="Bread Pay"
             chipText={`4 payments of $${offerSet.breadPay.monthlyAmount}`}
             subtext="Split your purchase into four payments with a shorter-term pay-over-time option."
+            offerType="breadpay"
             onClick={() => onSelectFinancingOffer(offerSet.breadPay)}
           />
         </Box>

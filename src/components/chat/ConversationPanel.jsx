@@ -30,56 +30,82 @@ export default function ConversationPanel({
     <Paper
       elevation={0}
       sx={{
-        background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.68)',
-        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(24,22,26,0.10)',
-        borderRadius: bareBonesUi ? '6px' : '24px',
-        p: minimalUi ? 1.5 : 2,
+        background: bareBonesUi
+          ? '#ffffff'
+          : 'linear-gradient(180deg, rgba(255,255,255,0.74) 0%, rgba(246,250,255,0.62) 100%)',
+        border: bareBonesUi ? '1px solid #d0d0d0' : '1px solid rgba(15,23,42,0.08)',
+        borderRadius: bareBonesUi ? '6px' : '30px',
+        p: minimalUi ? 1.75 : 2.25,
         display: 'grid',
-        gap: 1.5,
+        gap: 1.75,
         height: '100%',
         minHeight: 0,
         overflow: 'hidden',
         gridTemplateRows: '1fr auto',
-        boxShadow: bareBonesUi ? 'none' : '0 16px 40px rgba(24,22,26,0.06)',
-        backdropFilter: 'blur(8px)'
+        boxShadow: bareBonesUi ? 'none' : '0 24px 52px rgba(15,23,42,0.10)',
+        backdropFilter: 'blur(18px)',
+        position: 'relative'
       }}
     >
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background:
+            'radial-gradient(circle at 15% 12%, rgba(28,129,149,0.10), transparent 18%), radial-gradient(circle at 82% 18%, rgba(19,41,75,0.08), transparent 20%)'
+        }}
+      />
+
       <Paper
         elevation={0}
         sx={{
-          background: bareBonesUi ? '#ffffff' : 'rgba(255,255,255,0.72)',
-          border: bareBonesUi ? '1px solid #d8d8d8' : '1px solid rgba(24,22,26,0.08)',
-          borderRadius: bareBonesUi ? '4px' : '20px',
-          p: 1.5,
+          position: 'relative',
+          background: bareBonesUi
+            ? '#ffffff'
+            : 'linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(243,248,255,0.76) 100%)',
+          border: bareBonesUi ? '1px solid #d8d8d8' : '1px solid rgba(15,23,42,0.06)',
+          borderRadius: bareBonesUi ? '4px' : '24px',
+          p: 2,
           display: 'grid',
-          gap: 1.25,
+          gap: 1.5,
           minHeight: 0,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.7)'
         }}
       >
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-            gap: 1,
+            gap: 1.25,
             alignItems: 'center',
             flexWrap: 'wrap',
-            pb: 0.5
+            pb: 0.75
           }}
         >
           <Box>
             <Typography
               variant="overline"
               sx={{
-                color: 'text.secondary',
-                letterSpacing: '0.14em',
-                fontWeight: 700
+                color: '#1C8195',
+                letterSpacing: '0.16em',
+                fontWeight: 800,
+                fontSize: '0.82rem'
               }}
             >
-              AI commerce assistant
+              Bread AI commerce assistant
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-              Discover products, surface offers, and guide checkout in one conversation.
+            <Typography
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 500,
+                mt: 0.25,
+                fontSize: '1rem',
+                lineHeight: 1.6
+              }}
+            >
+              Discover products, compare financing, and complete checkout in one conversation.
             </Typography>
           </Box>
         </Box>
@@ -87,7 +113,7 @@ export default function ConversationPanel({
         <Box
           sx={{
             display: 'grid',
-            gap: 1.5,
+            gap: 1.75,
             alignContent: 'start',
             overflow: 'auto',
             pr: 0.5,

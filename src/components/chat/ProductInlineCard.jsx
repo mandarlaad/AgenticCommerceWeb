@@ -53,7 +53,7 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
 
         <Box sx={{ display: 'grid', gap: 0.75 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.25, alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography sx={{ fontSize: minimalUi ? 22 : 26, fontWeight: 700, lineHeight: 1.15 }}>
+            <Typography sx={{ fontSize: minimalUi ? 24 : 28, fontWeight: 800, lineHeight: 1.12 }}>
               {product.name}
             </Typography>
             <StatPill label={product.category || 'Uncategorized'} compact />
@@ -64,7 +64,7 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
           </Typography>
 
           <Stack direction="row" spacing={1.25} alignItems="baseline" flexWrap="wrap">
-            <Typography sx={{ fontSize: minimalUi ? 28 : 32, fontWeight: 800, color: '#b5522c', lineHeight: 1 }}>
+            <Typography sx={{ fontSize: minimalUi ? 30 : 36, fontWeight: 900, color: '#E47A44', lineHeight: 1 }}>
               ${product.price}
             </Typography>
             {monthly ? (
@@ -73,10 +73,27 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
               </Typography>
             ) : null}
           </Stack>
-
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ pt: 0.25 }}>
-            {monthly ? <Chip size="small" color="primary" label={`Pay as low as $${monthly}/mo`} /> : null}
-            <Chip size="small" color="secondary" label="Bread Pay available" />
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ pt: 0.35 }}>
+            {monthly ? (
+              <Chip
+                size="small"
+                label={`Bread Credit Card from $${monthly}/mo`}
+                sx={{
+                  background: '#1C8195',
+                  color: '#fff',
+                  fontWeight: 800
+                }}
+              />
+            ) : null}
+            <Chip
+              size="small"
+              label="Bread Pay available"
+              sx={{
+                background: '#13294B',
+                color: '#fff',
+                fontWeight: 800
+              }}
+            />
             <Chip size="small" variant="outlined" label="Selected for checkout" />
           </Stack>
 

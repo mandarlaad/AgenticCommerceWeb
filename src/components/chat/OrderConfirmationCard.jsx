@@ -33,28 +33,28 @@ export default function OrderConfirmationCard({
     <Paper
       elevation={0}
       sx={{
-        background: '#ffffff',
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,251,0.98) 100%)',
         border: '1px solid rgba(24,22,26,0.10)',
-        borderRadius: '24px',
-        p: 2.25,
+        borderRadius: '28px',
+        p: 2.5,
         display: 'grid',
         gap: 2,
-        boxShadow: '0 16px 40px rgba(24,22,26,0.06)'
+        boxShadow: '0 18px 42px rgba(24,22,26,0.08)'
       }}
     >
       <Box sx={{ display: 'grid', gap: 0.5 }}>
-        <Typography sx={{ fontSize: 24, fontWeight: 800 }}>
+        <Typography sx={{ fontSize: 26, fontWeight: 900, lineHeight: 1.1 }}>
           🎉 Order placed successfully
         </Typography>
-        <Typography sx={{ color: '#43505e', lineHeight: 1.55 }}>
-          Your purchase is confirmed and your financing is ready to use.
+        <Typography sx={{ color: '#43505e', lineHeight: 1.6 }}>
+          Your financing is approved and your purchase is confirmed.
         </Typography>
       </Box>
 
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '160px 1fr' },
+          gridTemplateColumns: { xs: '1fr', md: '180px 1fr' },
           gap: 2,
           alignItems: 'center'
         }}
@@ -65,16 +65,16 @@ export default function OrderConfirmationCard({
           alt={product.name}
           sx={{
             width: '100%',
-            height: 128,
+            height: 140,
             objectFit: 'cover',
-            borderRadius: '18px',
+            borderRadius: '20px',
             border: '1px solid rgba(24,22,26,0.08)',
             background: '#f7f7f7'
           }}
         />
 
         <Stack spacing={1}>
-          <Typography sx={{ fontSize: 20, fontWeight: 800 }}>
+          <Typography sx={{ fontSize: 22, fontWeight: 900 }}>
             {product.name}
           </Typography>
 
@@ -93,14 +93,14 @@ export default function OrderConfirmationCard({
       <Paper
         elevation={0}
         sx={{
-          p: 1.75,
-          borderRadius: '18px',
+          p: 2,
+          borderRadius: '20px',
           border: '1px solid rgba(24,22,26,0.08)',
           background: 'rgba(255,255,255,0.92)'
         }}
       >
         <Stack spacing={1}>
-          <Typography sx={{ fontWeight: 700 }}>
+          <Typography sx={{ fontWeight: 800, fontSize: 16 }}>
             Purchase summary
           </Typography>
 

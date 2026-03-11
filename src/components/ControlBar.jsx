@@ -2,6 +2,7 @@
 import { Box, Button, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded';
+import { buttonTokens, glassPanelStyle, palette, typeScale } from '../lib/theme';
 
 export default function ControlBar({
   routeMode,
@@ -12,8 +13,7 @@ export default function ControlBar({
   onReset,
   loading,
   lockDemoConfig,
-  runtimeReady,
-  bareBonesUi
+  runtimeReady
 }) {
   function submitFromTextArea(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -23,8 +23,16 @@ export default function ControlBar({
   }
 
   return (
-    <Box sx={{ display: 'grid', gap: 1.25 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+    <Box sx={{ display: 'grid', gap: 1.5 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 1.25,
+          flexWrap: 'wrap',
+          alignItems: 'center'
+        }}
+      >
         <ToggleButtonGroup
           exclusive
           value={routeMode}
@@ -35,10 +43,18 @@ export default function ControlBar({
           sx={{
             '& .MuiToggleButton-root': {
               borderRadius: '999px !important',
-              px: 1.5,
-              py: 0.75,
+              px: 2,
+              py: 1,
               textTransform: 'none',
-              fontWeight: 600
+              fontWeight: 700,
+              fontSize: typeScale.body,
+              borderColor: palette.line,
+              background: 'rgba(255,255,255,0.86)',
+              color: palette.primarySoft
+            },
+            '& .Mui-selected': {
+              background: 'linear-gradient(135deg, rgba(15,23,42,0.08) 0%, rgba(255,255,255,0.98) 100%) !important',
+              color: palette.ink
             }
           }}
         >
@@ -46,26 +62,49 @@ export default function ControlBar({
           <ToggleButton value="agentcore">Run AgentCore flow</ToggleButton>
         </ToggleButtonGroup>
 
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 600,
+            pr: 0.5,
+            fontSize: typeScale.body
+          }}
+        >
           {routeMode === 'agentcore'
             ? `Planner source: Bedrock runtime${!lockDemoConfig && !runtimeReady ? ' (runtime ARN not configured)' : ''}`
-            : 'Chat-guided ACP flow'}
+            : 'Conversational commerce assistant'}
         </Typography>
       </Box>
 
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: '1px solid rgba(24,22,26,0.10)',
-          background: 'rgba(255,255,255,0.92)',
-          p: 1.25
+          ...glassPanelStyle,
+          borderRadius: '28px',
+          px: 2,
+          pt: 1.25,
+          pb: 1.15,
+          position: 'relative',
+          overflow: 'hidden',
+          background:
+            'linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(245,250,255,0.90) 100%)'
         }}
       >
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background:
+              'radial-gradient(circle at 12% 16%, rgba(28,129,149,0.08), transparent 18%), radial-gradient(circle at 88% 22%, rgba(19,41,75,0.06), transparent 20%)'
+          }}
+        />
+
         <TextField
           multiline
-          minRows={2}
-          maxRows={6}
+          minRows={1}
+          maxRows={4}
           fullWidth
           variant="standard"
           value={prompt}
@@ -74,35 +113,69 @@ export default function ControlBar({
           placeholder={
             routeMode === 'agentcore'
               ? 'Ask the runtime to plan and complete the shopping flow'
-              : 'Ask for a product, budget, financing, or delivery preference'
+              : 'Search for products, budgets, financing, or merchant-specific offers'
           }
           InputProps={{
             disableUnderline: true
           }}
           sx={{
+            position: 'relative',
             '& .MuiInputBase-root': {
               alignItems: 'flex-start',
-              fontSize: 15,
-              lineHeight: 1.5
+              fontSize: '1.1rem',
+              lineHeight: 1.75,
+              px: 0.75,
+              py: 0.05,
+              fontWeight: 500,
+              color: palette.ink
+            },
+            '& textarea': {
+              padding: '4px 8px 8px 8px',
+              minHeight: '36px !important'
             }
           }}
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mt: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Try prompts like “suggest treadmills under 1200; offer financing”
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 1.25,
+            mt: 0.85,
+            pt: 0.95,
+            borderTop: `1px solid ${palette.softLine}`,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            position: 'relative'
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'text.secondary',
+              pl: 0.75,
+              fontWeight: 500,
+              fontSize: typeScale.bodySm
+            }}
+          >
+            Try: “show treadmills under $1200 with Bread Credit Card offers”
           </Typography>
 
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', pr: 0.25 }}>
             <Button
               onClick={onReset}
               disabled={loading}
               variant="outlined"
               startIcon={<RestartAltRoundedIcon />}
               sx={{
-                borderRadius: '999px',
-                textTransform: 'none',
-                fontWeight: 600
+                borderColor: buttonTokens.subtle.border,
+                background: buttonTokens.subtle.bg,
+                color: buttonTokens.subtle.color,
+                fontSize: typeScale.bodySm,
+                '&:hover': {
+                  background: buttonTokens.subtle.hover,
+                  borderColor: buttonTokens.subtle.border
+                }
               }}
             >
               Reset
@@ -114,11 +187,13 @@ export default function ControlBar({
               variant="contained"
               endIcon={<SendRoundedIcon />}
               sx={{
-                borderRadius: '999px',
-                px: 2,
-                textTransform: 'none',
-                fontWeight: 700,
-                boxShadow: 'none'
+                background: buttonTokens.neutral.bg,
+                color: buttonTokens.neutral.color,
+                fontSize: typeScale.bodySm,
+                boxShadow: '0 12px 24px rgba(15,23,42,0.18)',
+                '&:hover': {
+                  background: buttonTokens.neutral.hover
+                }
               }}
             >
               Send
