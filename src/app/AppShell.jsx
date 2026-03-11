@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Avatar, Box, Button, Chip, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+
 import ConversationPanel from '../components/chat/ConversationPanel';
 import SideWorkspace from '../components/sidepanel/SideWorkspace';
 import { fetchJson } from '../lib/api';
 import { defaultBareBonesUi, defaultMinimalUi, defaultRuntimeArn, defaultRuntimeQualifier, defaultRuntimeRegion } from '../lib/config';
 import { toolContractMap } from '../lib/contracts';
+
 import {
   describePlan,
   extractQuery,
@@ -16,6 +18,7 @@ import {
 import { panelStyle, palette, shellStyle } from '../lib/theme';
 import mockProfiles from '../lib/mockprofiles';
 import logo from '../images/logo.png';
+import logotext from '../images/logotext.png';
 
 const API_BASE = '/api';
 
@@ -134,6 +137,7 @@ export default function AppShell() {
   const [profileOpen, setProfileOpen] = useState(false);
 
   const orderId = order?.orderId || session?.checkoutSessionId || session?.sessionId || '';
+  const profileInitials = `${currentProfile?.firstName?.[0] || ''}${currentProfile?.lastName?.[0] || ''}`.toUpperCase();
 
   useEffect(() => {
     localStorage.setItem('agentcore-runtime-arn', runtimeArn || '');
@@ -527,37 +531,46 @@ export default function AppShell() {
                 src={logo}
                 alt="logo"
                 style={{
-                  height: 64,
+                  height: 124,
                   width: 'auto',
                   objectFit: 'contain'
                 }}
               />
-
+              {/* <img
+                src={logotext}
+                alt="logo"
+                style={{
+                  height: 124,
+                  width: 'auto',
+                  objectFit: 'contain'
+                }}
+              /> */}
               <div>
                 <div
                   style={{
-                    fontFamily: bareBonesUi ? '"Segoe UI", Arial, sans-serif' : '"Trebuchet MS", sans-serif',
-                    fontSize: 11,
-                    letterSpacing: '0.16em',
-                    textTransform: 'uppercase',
-                    color: palette.slate,
-                    marginBottom: 8
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 800,
+                    fontSize: '60px',
+                    color: '#13294B',
+                    letterSpacing: '-0.02em'
                   }}
                 >
-                  Agentic Commerce / ACP surface
+                  Agentic Commerce
+                                {/* >
+                  Agentic Commerce / ACP surface */}
                 </div>
 
-                <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
+                {/* <h1 style={{ margin: 0, fontSize: bareBonesUi ? 32 : minimalUi ? 34 : 48, lineHeight: 1, fontWeight: 600 }}>
                   Chat-guided checkout with protocol trace.
                 </h1>
 
                 <p style={{ margin: '8px 0 0', maxWidth: 760, fontSize: minimalUi ? 15 : 18, color: 'rgba(24,22,26,0.78)' }}>
                   {heroCopy}
-                </p>
+                </p> */}
               </div>
             </div>
 
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+            {/* <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
               <IconButton
                 onClick={() => setProfileOpen(true)}
                 sx={{
@@ -568,8 +581,10 @@ export default function AppShell() {
               >
                 <AccountCircleRoundedIcon sx={{ fontSize: 34 }} />
               </IconButton>
-            </Stack>
+            </Stack> */}
+                 
           </div>
+
         </section>
 
         <section
@@ -745,6 +760,26 @@ export default function AppShell() {
           </Button>
         </Box>
       </div>
+      <IconButton
+        onClick={() => setProfileOpen(true)}
+        sx={{
+          position: 'fixed',
+          top: 22,
+          right: 22,
+          zIndex: 1400,
+          width: 54,
+          height: 54,
+          border: '1px solid rgba(15,23,42,0.08)',
+          background: 'rgba(255,255,255,0.94)',
+          boxShadow: '0 10px 24px rgba(15,23,42,0.10)',
+          color: '#43505e',
+          '&:hover': {
+            background: 'rgba(255,255,255,1)'
+          }
+        }}
+      >
+        <AccountCircleRoundedIcon sx={{ fontSize: 32 }} />
+      </IconButton>
     </div>
   );
 }

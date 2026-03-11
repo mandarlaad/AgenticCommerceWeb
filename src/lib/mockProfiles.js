@@ -3,15 +3,15 @@ const mockProfiles = [
     id: 'profile-new',
     customerType: 'new',
     riskLevel: 'normal',
-    firstName: 'Emily',
-    lastName: 'Carter',
-    email: 'emily.carter@gmail.com',
-    phone: '(614) 555-2193',
+    firstName: 'Robert',
+    lastName: 'Junior',
+    email: 'Robert.junior@gmail.com',
+    phone: '(999) 888-9999',
     shippingAddress: {
-      line1: '1184 Summit Park Dr',
+      line1: '3075 loyalty cir',
       city: 'Columbus',
       region: 'OH',
-      postalCode: '43004'
+      postalCode: '43219'
     },
     rewardsMember: false
   },

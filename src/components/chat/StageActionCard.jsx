@@ -124,7 +124,6 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
                 sx={{ background: '#13294B', color: '#fff' }}
               />
 
-              <Chip size="small" variant="outlined" label="Prequalify" />
             </Stack>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -449,7 +448,19 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
                 textTransform: 'none',
                 fontWeight: 700,
                 boxShadow: 'none',
-                px: 2.25
+                px: 2.25,
+                 background: '#43505e',
+                color: '#fff',
+
+                '&:hover': {
+                  background: '#43505e'
+                },
+
+                '&.Mui-disabled': {
+                  background: '#43505e',
+                  color: '#ffffff',
+                  opacity: 0.45
+                }
               }}
             >
               Check my offers
@@ -514,7 +525,14 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
                 borderRadius: '999px',
                 textTransform: 'none',
                 fontWeight: 700,
-                boxShadow: 'none'
+                boxShadow: 'none',
+                color: '#fff',
+
+                '&.Mui-disabled': {
+                  background: '#43505e',
+                  color: '#ffffff',
+                  opacity: 0.45
+                }
               }}
             >
               Send secure link

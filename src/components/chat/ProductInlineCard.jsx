@@ -67,11 +67,11 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
             <Typography sx={{ fontSize: minimalUi ? 30 : 36, fontWeight: 900, color: '#E47A44', lineHeight: 1 }}>
               ${product.price}
             </Typography>
-            {monthly ? (
+            {/* {monthly ? (
               <Typography sx={{ fontSize: 14, color: '#43505e', fontWeight: 600 }}>
                 or pay as low as ${monthly}/mo
               </Typography>
-            ) : null}
+            ) : null} */}
           </Stack>
           <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ pt: 0.35 }}>
             {monthly ? (
@@ -81,7 +81,7 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
                 sx={{
                   background: '#1C8195',
                   color: '#fff',
-                  fontWeight: 800
+                  fontWeight: 450
                 }}
               />
             ) : null}
@@ -91,10 +91,9 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
               sx={{
                 background: '#13294B',
                 color: '#fff',
-                fontWeight: 800
+                fontWeight: 450
               }}
             />
-            <Chip size="small" variant="outlined" label="Selected for checkout" />
           </Stack>
 
           {summary ? (
