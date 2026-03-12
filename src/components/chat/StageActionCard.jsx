@@ -9,7 +9,10 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography
+  Typography,
+  Dialog,
+  DialogContent,
+  Rating
 } from '@mui/material';
 import StatPill from '../common/StatPill';
 import { productArtwork } from '../../lib/planning';
@@ -58,13 +61,18 @@ function randomTerm() {
   return terms[Math.floor(Math.random() * terms.length)];
 }
 
-function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
+function OptionCard({ option, onSelectProduct, loading, bareBonesUi, setPreviewProduct  }) {
   const monthly = monthlyEstimate(option.price);
 
   return (
     <Paper
       elevation={0}
+        onClick={() => {
+    console.log('clicked', option);
+    setPreviewProduct(option);
+  }}
       sx={{
+            cursor: 'pointer',
         borderRadius: bareBonesUi ? '4px' : '18px',
         border: bareBonesUi ? '1px solid #cccccc' : '1px solid rgba(24,22,26,0.10)',
         background: '#ffffff',
@@ -83,7 +91,7 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
       >
         <Box
           component="img"
-          src={kaylogo}      
+          src={option.product_url || artwork}    
           alt={option.name}
           sx={{
             width: '100%',
@@ -102,7 +110,9 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
                 {option.name}
               </Typography>
               <Typography sx={{ color: '#5b6670', fontSize: 13 }}>
-                SKU {option.sku} {option.category ? `• ${option.category}` : ''}
+                {/* SKU {option.sku} {option.category ? `• ${option.category}` : ''} */}
+                  {option.brand ? `Sold by ${option.brand}` : ''}
+
               </Typography>
             </Box>
 
@@ -111,7 +121,7 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
             </Typography>
           </Box>
 
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+          {/* <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
               {monthly ? (
                 <Chip
                   size="small"
@@ -126,7 +136,28 @@ function OptionCard({ option, onSelectProduct, loading, bareBonesUi }) {
                 sx={{ background: '#13294B', color: '#fff' }}
               />
 
-            </Stack>
+            </Stack> */}
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+            {option.isClient ? (
+              <>
+                {monthly ? (
+                 <Chip
+                    size="small"
+                    label={`Bread Credit Card from $${monthly}/mo`}
+                    sx={{ background: '#1C8195', color: '#fff' }}
+                  />
+                ) : null}
+                <Chip
+                  size="small"
+                  label="Bread Pay available"
+                  sx={{ background: '#13294B', color: '#fff' }}
+                />
+              </>
+            ) : (
+              <Chip size="small" variant="outlined" label="Financing not available" />
+            )}
+          </Stack>
+
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
@@ -262,6 +293,7 @@ export default function StageActionCard({
   const [allowMarketing, setAllowMarketing] = useState(true);
   const [allowSms, setAllowSms] = useState(false);
   const [offerSet, setOfferSet] = useState(null);
+  const [previewProduct, setPreviewProduct] = useState(null);
 
   useEffect(() => {
     if (stage === 'consent') {
@@ -302,6 +334,7 @@ export default function StageActionCard({
 if (!stage || stage === 'idle' || stage === 'complete') return null;
 
   return (
+    <>
     <Paper
       elevation={0}
       sx={{
@@ -338,6 +371,8 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
                 onSelectProduct={onSelectProduct}
                 loading={loading}
                 bareBonesUi={bareBonesUi}
+                  setPreviewProduct={setPreviewProduct}
+
               />
             ))}
           </Box>
@@ -793,6 +828,42 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
           </Box>
         </Box>
       ) : null}
+
     </Paper>
+    
+    <Dialog
+      open={Boolean(previewProduct)}
+      onClose={() => setPreviewProduct(null)}
+      maxWidth="sm"
+      fullWidth
+    >
+      {previewProduct && (
+        <DialogContent>
+
+          <Box
+            component="img"
+            src={previewProduct.product_url}
+            alt={previewProduct.name}
+            sx={{ width: '100%', borderRadius: 2, mb: 2 }}
+          />
+
+          <Typography variant="h6">
+            {previewProduct.name}
+          </Typography>
+
+          <Typography sx={{ color: '#6b7280', mb: 1 }}>
+            Sold by {previewProduct.brand}
+          </Typography>
+
+          <Typography sx={{ fontWeight: 600 }}>
+            ${previewProduct.price}
+          </Typography>
+
+          <Rating value={4.5} precision={0.5} readOnly />
+
+        </DialogContent>
+      )}
+    </Dialog>
+    </>
   );
 }
