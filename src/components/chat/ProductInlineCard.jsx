@@ -13,11 +13,7 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
   if (!product) return null;
 
   const monthly = monthlyEstimate(product.price);
-const imageSrc =
-  product?.name?.toLowerCase().includes('ring') ||
-  product?.name?.toLowerCase().includes('earring')
-    ? kaylogo
-    : artwork;
+
   return (
     <Paper
       elevation={0}
@@ -43,7 +39,7 @@ const imageSrc =
         {!bareBonesUi ? (
         <Box
           component="img"
-          src={kaylogo}
+          src={product?.product_url || kaylogo}
           alt={product.name}
           sx={{
             width: '100%',

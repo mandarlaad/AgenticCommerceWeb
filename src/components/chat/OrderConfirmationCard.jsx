@@ -63,7 +63,7 @@ export default function OrderConfirmationCard({
       >
         <Box
           component="img"
-          src={kaylogo}
+          src={product?.product_url || kaylogo}
           alt={product.name}
           sx={{
             width: '100%',
