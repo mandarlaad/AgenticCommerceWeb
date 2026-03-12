@@ -860,7 +860,9 @@ if (!stage || stage === 'idle' || stage === 'complete') return null;
           </Typography>
 
           <Rating value={4.5} precision={0.5} readOnly />
-
+        <Typography sx={{ color: '#6b7280', mt: 1.5, lineHeight: 1.6 }}>
+          {previewProduct.product_description}
+        </Typography>
         </DialogContent>
       )}
     </Dialog>
