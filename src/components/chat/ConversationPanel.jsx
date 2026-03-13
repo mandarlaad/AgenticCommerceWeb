@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from 'react';
+﻿//Manoj ConversationPanel.jsx
+import React, { useEffect, useState } from 'react';
 import { Box, Paper, Typography } from '@mui/material';
 import ControlBar from '../ControlBar';
 import MessageBubble from './MessageBubble';
@@ -188,6 +189,7 @@ useEffect(() => {
         loading={loading}
         lockDemoConfig={true}
         runtimeReady={routeMode !== 'agentcore' || runtimeReady}
+        planState={planState}
         bareBonesUi={bareBonesUi}
       />
     </Paper>

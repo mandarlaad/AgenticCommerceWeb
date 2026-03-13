@@ -1,4 +1,5 @@
-﻿import React from 'react';
+﻿// manoj_controlbar
+import React from 'react';
 import { Box, Button, Paper, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import RestartAltRoundedIcon from '@mui/icons-material/RestartAltRounded';
@@ -13,7 +14,8 @@ export default function ControlBar({
   onReset,
   loading,
   lockDemoConfig,
-  runtimeReady
+  runtimeReady,
+  planState
 }) {
   function submitFromTextArea(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -21,6 +23,13 @@ export default function ControlBar({
       onSend();
     }
   }
+  function plannerLabel() {
+      if (routeMode !== 'agentcore') return 'Conversational commerce assistant';
+      if (!lockDemoConfig && !runtimeReady) return 'Planner source: AgentCore runtime (runtime ARN not configured)';
+      if (!planState?.source) return 'Planner source: AgentCore runtime';
+      const modelId = planState?.plannerModelId ? ` | ${planState.plannerModelId.split('/').slice(-1)[0]}` : '';
+      return `Planner source: ${planState.source}${modelId}`;
+    }  
 
   return (
     <Box sx={{ display: 'grid', gap: 1.5 }}>
@@ -61,7 +70,6 @@ export default function ControlBar({
           <ToggleButton value="acp">Run ACP flow</ToggleButton>
           <ToggleButton value="agentcore">Run AgentCore flow</ToggleButton>
         </ToggleButtonGroup>
-
         <Typography
           variant="body2"
           sx={{
@@ -71,9 +79,7 @@ export default function ControlBar({
             fontSize: typeScale.body
           }}
         >
-          {routeMode === 'agentcore'
-            ? `Planner source: Bedrock runtime${!lockDemoConfig && !runtimeReady ? ' (runtime ARN not configured)' : ''}`
-            : 'Conversational commerce assistant'}
+          {plannerLabel()}
         </Typography>
       </Box>
 
