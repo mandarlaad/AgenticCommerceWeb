@@ -82,7 +82,7 @@ export default function AppShell() {
   const [runtimeArn, setRuntimeArn] = useState(() => defaultRuntimeArn || localStorage.getItem('agentcore-runtime-arn') || '');
   const [runtimeRegion] = useState(defaultRuntimeRegion);
   const [runtimeQualifier] = useState(defaultRuntimeQualifier);
-  const [prompt, setPrompt] = useState('Find me a pair of diamond earrings under $1500 and finance it');
+  const [prompt, setPrompt] = useState('Find me a diamond ring under $1500 and finance it');
   const [messages, setMessages] = useState([]);
   const [trace, setTrace] = useState([]);
   const [toolContracts, setToolContracts] = useState([]);
