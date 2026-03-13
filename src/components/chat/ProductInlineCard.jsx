@@ -61,7 +61,9 @@ export default function ProductInlineCard({ product, summary, artwork, minimalUi
           </Box>
 
           <Typography sx={{ fontSize: 12, color: '#5b6670', fontWeight: 500 }}>
-            SKU {product.sku} {product.category ? `• ${product.category}` : ''}
+           {product.brand ? `Sold by ${product.brand}` : ''}
+
+            {/* SKU {product.sku} {product.category ? `• ${product.category}` : ''} */}
           </Typography>
 
           <Stack direction="row" spacing={1.25} alignItems="baseline" flexWrap="wrap">

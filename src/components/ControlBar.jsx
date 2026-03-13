@@ -46,7 +46,15 @@ export default function ControlBar({
           exclusive
           value={routeMode}
           onChange={(_, next) => {
-            if (next) setRouteMode(next);
+            if (next){
+                setRouteMode(next);
+                if(next === 'agentcore'){
+                    setPrompt('Find me a diamond ring under $1200 and finance it');
+                }
+                if(next === 'acp'){
+                    setPrompt('Find me a diamond ring under $1500 and finance it');
+                }
+            } 
           }}
           size="small"
           sx={{
